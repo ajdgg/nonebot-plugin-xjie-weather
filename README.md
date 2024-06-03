@@ -40,7 +40,7 @@ pip install nonebot-plugin-xjie-weather
 | API              | 是否支持    |
 | :--------------: | :--------: |
 | 高德天气         | 支持✅     |
-| 和风天气         | 未完成❌   |
+| 和风天气         | 未完成✅   |
 | Visual Crossing | 未完成❌   |
 | 心知天气         | 未完成❌  |
 
