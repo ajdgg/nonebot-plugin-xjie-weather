@@ -1,6 +1,7 @@
-import requests 
+import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
 
 class xj_requests:
     def __init__(self):
@@ -8,13 +9,14 @@ class xj_requests:
         retry_strategy = Retry(
             total=3,
             backoff_factor=1,  # 延迟时间
-            status_forcelist=[500, 502, 503, 504], 
+            status_forcelist=[500, 502, 503, 504],
             allowed_methods=["GET"]
         )
         adapter = HTTPAdapter(max_retries=retry_strategy)
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
         pass
+
     def xj_requests_main(self, place_url):
         try:
             response = self.session.get(place_url, timeout=10)
