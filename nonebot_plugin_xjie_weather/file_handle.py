@@ -47,7 +47,7 @@ class xj_file_handle:
         except IOError as e:
             print(f"写入文件时发生错误: {e}")
 
-    def get_keys_ending_with_key(self, json_data, key_suffix='_KEY'):
+    def get_keys_ending_with_key(self, json_data, key_suffix="_KEY"):
         json_file_path_reading = file_path(json_data)
         with json_file_path_reading.open("r", encoding="utf-8") as json_file:
             loaded_data = json.load(json_file)
