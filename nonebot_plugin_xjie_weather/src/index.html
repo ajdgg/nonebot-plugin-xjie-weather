@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <main id="main">{% block content %}
+        <div class="weather-content">
+			<div class="weather-groundfloor">
+                {{ content }}
+				<div class="weather-c-right">
+					<div class="weather-temperature">{{ temperature }}℃</div>
+					<div class="weather-city">{{ name }}</div>
+				</div>
+			</div>
+            <div class="weather-forecast">
+                {{ forecast }}
+            </div>
+            <div class="weather-time">{{ time }}</div>
+		</div>
+        <ul class="weather-list">
+            {% for day in lis %}
+            <li>
+                <div class="weather-list-day">
+                    <div class="weather-list-week">{{ day.week }}</div>
+                    <div class="weather-list-date">{{ day.date }}</div>
+                </div>
+                {{ day.weather_list_image }}
+                <div class="weather-list-show">
+                    {{ day.temp_range }}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endblock %}</main>
+</body>
+</html>

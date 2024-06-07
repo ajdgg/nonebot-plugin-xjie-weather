@@ -1,11 +1,13 @@
 import asyncio
 from nonebot import get_bot
+from pathlib import Path
 from nonebot.adapters import Message
 from .file_handle import xj_file_handle
 from .get_weather import get_weather
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot import on_command, on_message
 from nonebot.rule import to_me
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg, ArgPlainText
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
 from nonebot.plugin import PluginMetadata
@@ -260,15 +262,29 @@ async def bot_self_inspection():
 @xj_weather.handle()
 async def handle_first_receive(args: Message = CommandArg()):
     if xj_user_message := args.extract_plain_text():
-        # a = get_weather.xj_get_weather_main(xj_user_message, "186d8b071eb3f199e1cc4e583e6070f8")
+        path = Path(__file__).parent / "weatherforecast.png"
         if _get_default_platform["mr"] != '':
-            a = get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
-            await xj_weather.finish(a)
+            bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
+            if bot_result == '200':
+                image = MessageSegment.image(path)
+                await xj_weather.finish(image)
         else:
-            a = get_weather.xj_get_weather_main(xj_user_message)
-            await xj_weather.finish(a)
-    #     path = Path(__file__).parent / "image/csa.png"
-    # # 构造图片消息段
-    #     image = MessageSegment.image(path)
-    # 发送图片
-        await xj_weather.finish('⛅')
+            bot_result = await get_weather.xj_get_weather_main(xj_user_message)
+            if bot_result == '200':
+                image = MessageSegment.image(path)
+                await xj_weather.finish(image)
+
+
+@xj_weather.got("xj_user_message", prompt="请输入地名")
+async def got_location(xj_user_message: str = ArgPlainText()):
+    path = Path(__file__).parent / "weatherforecast.png"
+    if _get_default_platform["mr"] != '':
+        bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
+        if bot_result == '200':
+            image = MessageSegment.image(path)
+            await xj_weather.finish(image)
+    else:
+        bot_result = await get_weather.xj_get_weather_main(xj_user_message)
+        if bot_result == '200':
+            image = MessageSegment.image(path)
+            await xj_weather.finish(image)

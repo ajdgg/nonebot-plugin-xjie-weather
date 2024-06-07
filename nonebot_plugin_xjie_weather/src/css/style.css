@@ -1,0 +1,171 @@
+html, body, div, span, ul, li{
+    margin: 0;
+    padding: 0;
+	box-sizing: border-box;
+}
+body{
+	background-color: #CCFFFF;
+	display: flex;
+	justify-content: center;
+	
+}
+li{
+	list-style: none;
+}
+:root{
+	--weather-content-width: 1024px;
+	/* --weather-content-height: 520px; */
+	--weather-image-wh:200px;
+	/* --weather-city-top: calc(var(--weather-image-wh) + var(--weather-image-inset)) */
+}
+/* div, ul, li{
+	border: 1px solid #66C;
+} */
+#vd{
+	width: 520px;
+	height: 1000px;
+	background-color: #66CCFF;
+}
+#main{
+	/* float: left; */
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+	padding: 10px;
+	/* border: 1px solid #66C; */
+}
+.weather-content{
+    width: var(--weather-content-width);
+	height: var(--weather-content-height);
+	float: left;
+	border-radius: 10px;
+	background-color: #66CCFF;
+}
+.weather-image{
+	width: var(--weather-image-wh);
+	height: var(--weather-image-wh);
+	margin: 10px 90px 0;
+}
+.weather-groundfloor{
+	display: flex;
+}
+.weather-c-right{
+	margin: 30px 90px 0 auto;
+	text-align: center;
+}
+.weather-city{
+	text-align: center;
+	font-size: 30px;
+	font-weight: bold;
+}
+.weather-temperature{
+	color: aliceblue;
+	font-size: 100px;
+	font-weight: bold;
+}
+.weather-forecast{
+	padding: 5px;
+	margin: 20px 50px;
+	border-radius: 15px;
+	background: rgb(240 248 255 / 30%);
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	/* grid-template-rows: repeat(3, 1fr); */
+	grid-gap: 10px;
+}
+.humidness, .wind{
+	margin: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	font-size: 15px;
+	font-weight: bold;
+	color: aliceblue;
+}
+.humidness-image{
+	width: 50px;
+	height: 50px;
+	background: no-repeat center/100% url('../image/humidity.svg');
+}
+.weather-time{
+	text-align: right;
+	color: #eee;
+	font-size: 20px;
+	font-weight: bold;
+	margin: 10px 25px;
+}
+.wind-image{
+	width: 50px;
+	height: 50px;
+	background: no-repeat center/100% url('../image/wind.svg');
+}
+.wind-data span{
+	padding-left: 10px;
+}
+
+.weather-list{
+	color: #eee;
+	margin-top: 10px;
+	border-radius: 15px;
+	background-color: #99CCFF;
+}
+.weather-list li{
+	display: flex;
+	border-radius: 15px;
+	margin: 10px;
+	/* background: rgb(240 248 255 / 30%); */
+}
+.weather-list-day{
+	font-weight: bold;
+	margin: 10px 50px;
+	text-align: center;
+}
+.weather-list-week{
+	font-size: 30px;
+}
+.weather-list-date{
+	font-size: 16px;
+}
+.weather-list-image{
+	width: 50px;
+	margin: 0 auto;
+}
+.weather-list-show{
+	width: 150px;
+	font-size: 23px;
+	margin: 10px 50px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+
+/* 晴 */
+.clear{
+	background: no-repeat center/100% url('../image/clear.svg');
+}
+/* 多云 */
+.cloudy{
+	background: no-repeat center/100% url('../image/cloudy.svg');
+}
+/* 阴 */
+/* .weather-image-cloudy{
+	background: no-repeat center/100% url('../image/cloudy.svg');
+} */
+/* 小雨 */
+.light-rain{
+	background: no-repeat center/100% url('../image/light-rain.svg');
+}
+/* 中雨 */
+.moderate-rain{
+	background: no-repeat center/100% url('../image/moderate-rain.svg');
+}
+/* 大雨 */
+.heavy-rain{
+	background: no-repeat center/100% url('../image/heavy-rain.svg');
+}
+/* 暴雨 */
+.storm-rain{
+	background: no-repeat center/100% url('../image/storm-rain.svg');
+}
