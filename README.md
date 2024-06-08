@@ -1,14 +1,8 @@
-<!--
- * @Author: AwAjie 139576615+ajdgg@users.noreply.github.com
- * @Date: 2024-06-02 18:54:27
- * @LastEditors: AwAjie 139576615+ajdgg@users.noreply.github.com
- * @LastEditTime: 2024-06-03 10:01:46
- * @FilePath: \nonebot-plugin-xjie-weather\README.md
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
--->
 <div align="center">
 
-<img width = "100px" src="https://www.freeimg.cn/i/2024/06/02/665c4cfd079d1.png">
+<img width = "100px" style="margin-right: 40px" src="https://www.freeimg.cn/i/2024/06/02/665c4cfd079d1.png">
+<a width= "100px" href="https://v2.nonebot.dev/store"><img src="https://user-images.githubusercontent.com/44545625/209862575-acdc9feb-3c76-471d-ad89-cc78927e5875.png" width="100" alt="NoneBotPluginLogo"></a>
+</p>
 
 # nonebot-plugin-xjie-weather
 
@@ -20,7 +14,7 @@ _✨一个 NoneBot 天气插件✨_
 
 </div>
 
-<!-- # 安装
+# 安装
 
 - 使用 nb-cli
 
@@ -32,7 +26,7 @@ nb plugin install nonebot-plugin-xjie-weather
 
 ```
 pip install nonebot-plugin-xjie-weather
-``` -->
+```
 
 # 支持
 目前支持
@@ -44,9 +38,41 @@ pip install nonebot-plugin-xjie-weather
 | Visual Crossing | 未完成❌   |
 | 心知天气         | 未完成❌  |
 
+# BUG反馈
+请提```issues```或邮箱```1095530449@qq.com```
 
 # 配置
 ### 一
-- 使用交互式设置key
-### 二
-- 在插件中找到```xjie_data.json```文件直接写入key
+- 使用```st```命令交互式设置key
+
+```
+AMAP_KEY         高德
+QWEATHER_KEY     和风天气
+```
+如果有多个key想使用哪个或者在一个平台的调用次数用完后可以进行切换
+```
+default_api     优先使用的平台
+
+手动填入的话平台名为上面的key名
+```
+![pz-bot-key.png](https://www.freeimg.cn/i/2024/06/08/6664606407e72.png)
+
+# 平台key获取
+ [📦 高德](/amap.md)
+
+ <!-- [📦 和风天气](/heweather.md) -->
+
+ # 插件返回的天气预报图片效果
+
+ ## 高德
+
+高德地图返回的天气数据种类不多但对于只看个天气预报而已的完全够
+
+毕竟高德调用的次数挺多的
+
+![gd-4.png](https://www.freeimg.cn/i/2024/06/09/66649014c179e.png)
+
+## 和风天气
+好看
+
+![hf-1.png](https://www.freeimg.cn/i/2024/06/09/66649228a6662.png)
