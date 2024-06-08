@@ -1,11 +1,10 @@
 import asyncio
-from nonebot import get_bot
 from pathlib import Path
 from nonebot.adapters import Message
 from .file_handle import xj_file_handle
 from .get_weather import get_weather
 from nonebot.adapters.onebot.v11 import MessageSegment
-from nonebot import on_command, on_message
+from nonebot import on_command, on_message, get_bot
 from nonebot.rule import to_me
 from nonebot.params import CommandArg, ArgPlainText
 from nonebot.adapters import Bot, Event
@@ -14,14 +13,13 @@ from nonebot.plugin import PluginMetadata
 
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-xjie-weather",
-    description="",
-    usage="",
+    description="一个小小的天气插件",
+    usage="目前支持和风天气和高德地图的天气api",
     type="application",
     homepage="https://github.com/ajdgg/nonebot-plugin-xjie-weather",
 )
 
 _time_a = {}
-# _event = asyncio.Event()
 _get_default_platform = {}
 _configuration_state = {}
 _configuration_option = {}
@@ -58,14 +56,6 @@ get_weather = get_weather()
 xj_file_handle = xj_file_handle()
 _get_default_platform["xjie_data"] = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
 _get_default_platform["mr"] = xj_file_handle.xj_file_reading("xjie_data.json", "default_api")
-# amap_key = xj_file_handle.xj_file_reading("xjie_data.json","AMAP_WEATHER_KEY")
-# a = list(key_value_pairs.items())
-# # first_key, first_value = a[0]
-print(_get_default_platform["xjie_data"])
-
-# admin_whitelist_str = json.dumps(_admin_whitelist)
-# xj_file_handle.xj_file_change("xjie_data.json", "admin_whitelist", admin_whitelist_str)
-# print(_admin_whitelist == [])
 
 
 def is_integer_not_float(s):
@@ -79,20 +69,20 @@ def is_integer_not_float(s):
         return False
 
 
+def original(user_id):
+    del _configuration_state[user_id]
+    del _configuration_option["option"]
+    del _configuration_option["SL"]
+    del _configuration_option["X_KEY"]
+    _configuration_option["SG"] = False
+    _configuration_option["SF"] = False
+
+
 async def timeout_task(user_id, task):
-    print("开始执行超时任务")
     await asyncio.sleep(300)
-    bot = get_bot()  # 获取Bot实例
-    print("超时任务执行完毕")
+    bot = get_bot()
     if _time_a["t"]:
-        # 发送超时通知
-        print("超时")
-        del _configuration_state[user_id]
-        del _configuration_option["option"]
-        del _configuration_option["SL"]
-        del _configuration_option["X_KEY"]
-        _configuration_option["SG"] = False
-        _configuration_option["SF"] = False
+        original(user_id)
         message = "您的操作已超时，会话 已结束。"
         await bot.send_private_msg(user_id=user_id, message=message)
 
@@ -132,13 +122,11 @@ xj_configuration_responsive = on_message(rule=lambda event: isinstance(event, Ev
 
 @xj_configuration_responsive.handle()
 async def configuration_responsive(bot: Bot, event: Event):
-    # timeout_task(user_id)
-    # await xj_configuration_responsive.send("1206")
     user_id = event.get_user_id()
     args = str(event.get_message()).strip()
     if args == "退出":
-        # 等下再写
-        pass
+        await xj_configuration_responsive.send("退出成功")
+        original(user_id)
     if _configuration_option["option"] == "set_administrator":
 
         if args in xj_yes:
@@ -171,8 +159,6 @@ async def configuration_responsive(bot: Bot, event: Event):
                 print(args)
             except IndexError:
                 await xj_weather.finish("输入错误，请重新输入")
-
-        print(args, "1002913")
 
         keydata = xj_file_handle.xj_file_reading("xjie_data.json")
         keys_ending_with_KEY = [k for k in keydata.keys() if k.endswith("_KEY")]
@@ -251,7 +237,7 @@ async def configuration_responsive(bot: Bot, event: Event):
         else:
             await xj_configuration_responsive.finish("输入错误")
 
-xj_weather = on_command("tq", rule=to_me(), priority=10, block=True)
+xj_weather = on_command("天气", rule=to_me(), priority=10, block=True)
 
 
 @xj_weather.handle()

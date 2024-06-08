@@ -129,7 +129,6 @@ li{
 	display: flex;
 	border-radius: 15px;
 	margin: 10px;
-	/* background: rgb(240 248 255 / 30%); */
 }
 .weather-list-day{
 	font-weight: bold;
