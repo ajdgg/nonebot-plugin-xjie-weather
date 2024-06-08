@@ -3,13 +3,14 @@ from pathlib import Path
 from nonebot.adapters import Message
 from .file_handle import xj_file_handle
 from .get_weather import get_weather
-from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot import on_command, on_message, get_bot
 from nonebot.rule import to_me
 from nonebot.params import CommandArg, ArgPlainText
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
 from nonebot.plugin import PluginMetadata
+
+from nonebot_plugin_alconna import UniMessage
 
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-xjie-weather",
@@ -253,13 +254,11 @@ async def handle_first_receive(args: Message = CommandArg()):
         if _get_default_platform["mr"] != '':
             bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
             if bot_result == '200':
-                image = MessageSegment.image(path)
-                await xj_weather.finish(image)
+                await UniMessage.image(path=path).send()
         else:
             bot_result = await get_weather.xj_get_weather_main(xj_user_message)
             if bot_result == '200':
-                image = MessageSegment.image(path)
-                await xj_weather.finish(image)
+                await UniMessage.image(path=path).send()
 
 
 @xj_weather.got("xj_user_message", prompt="请输入地名")
@@ -268,10 +267,8 @@ async def got_location(xj_user_message: str = ArgPlainText()):
     if _get_default_platform["mr"] != '':
         bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
         if bot_result == '200':
-            image = MessageSegment.image(path)
-            await xj_weather.finish(image)
+            await UniMessage.image(path=path).send()
     else:
         bot_result = await get_weather.xj_get_weather_main(xj_user_message)
         if bot_result == '200':
-            image = MessageSegment.image(path)
-            await xj_weather.finish(image)
+            await UniMessage.image(path=path).send()
