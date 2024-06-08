@@ -11,6 +11,7 @@ from nonebot.params import CommandArg, ArgPlainText
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
 from nonebot.plugin import PluginMetadata
+
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-xjie-weather",
     description="",

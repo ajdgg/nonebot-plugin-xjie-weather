@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/qweather-icons.css">
 </head>
 <body>
     <main id="main">{% block content %}
@@ -13,12 +14,15 @@
                 {{ content }}
 				<div class="weather-c-right">
 					<div class="weather-temperature">{{ temperature }}℃</div>
-					<div class="weather-city">{{ name }}</div>
+                    <div class="weather-city-date">
+                        <div>{{ weather }}</div>
+                        <div class="weather-city">{{ name }}</div>
+                    </div>
 				</div>
 			</div>
-            <div class="weather-forecast">
+            
                 {{ forecast }}
-            </div>
+            
             <div class="weather-time">{{ time }}</div>
 		</div>
         <ul class="weather-list">

@@ -1,61 +1,76 @@
 import copy
-img_svg_data = {
-    "晴": '<div class="weather-image clear"></div>',
-    "阴": '<div class="weather-image cloudy"></div>',
-    "多云": '<div class="weather-image cloudy"></div>',
-    "小雨": '<div class="weather-image light-rain"></div>',
-    "中雨": '<div class="weather-image moderate-rain"></div>',
-    "大雨": '<div class="weather-image heavy-rain"></div>',
-}
-list_svg_data = {
-    "晴": '<div class="weather-list-image clear"></div>',
-    "阴": '<div class="weather-list-image cloudy"></div>',
-    "多云": '<div class="weather-list-image cloudy"></div>',
-    "小雨": '<div class="weather-list-image light-rain"></div>',
-    "中雨": '<div class="weather-list-image moderate-rain"></div>',
-    "大雨": '<div class="weather-list-image heavy-rain"></div>',
-}
+from datetime import datetime
 
-_week = {
-    "1": "星期一",
-    "2": "星期二",
-    "3": "星期三",
-    "4": "星期四",
-    "5": "星期五",
-    "6": "星期六",
-    "7": "星期日"
+
+icon = {
+    "晴": "100",
+    "多云": "101",
+    "少云": "102",
+    "晴间多云": "103",
+    "阴": "104",
+    "阵雨": "300",
+    "强阵雨": "301",
+    "雷阵雨": "302",
+    "强雷阵雨": "303",
+    "雷阵雨伴有冰雹": "304",
+    "小雨": "305",
+    "中雨": "306",
+    "大雨": "307",
+    "极端降雨": "308",
+    "毛毛雨/细雨": "309",
+    "暴雨": "310",
+    "大暴雨": "311",
+    "特大暴雨": "312",
+    "冻雨": "313",
+    "小到中雨": "314",
+    "中到大雨": "315",
+    "大到暴雨": "316",
+    "暴雨到大暴雨": "317",
+    "大暴雨到特大暴雨": "318",
+    "雨": "399",
+    "小雪": "400",
+    "中雪": "401",
+    "大雪": "402",
+    "暴雪": "403",
+    "雨夹雪": "404",
+    "雨雪天气": "405",
+    "小到中雪": "408",
+    "中到大雪": "409",
+    "大到暴雪": "410",
+    "阵雨夹雪": "456",
+    "阵雪": "457",
+    "雪": "499",
+    "薄雾": "500",
+    "雾": "501",
+    "霾": "502",
+    "扬沙": "503",
+    "浮尘": "504",
+    "沙尘暴": "507",
+    "强沙尘暴": "508",
+    "浓雾": "509",
+    "强浓雾": "510",
+    "中度霾": "511",
+    "重度霾": "512",
+    "严重霾": "513",
+    "大雾": "514",
+    "特强浓雾": "515",
+    "热": "900",
+    "冷": "901",
+    "未知": "999",
 }
 
 _eventual_data = {}
 
 
-def add_or_replace_key_in_dicts(data_list, key_operation, key_source, replacement_dict=None, add_new_key=False, new_key_name=None):
+def infer_weekday(year, month, day):
     """
-    在字典列表的深拷贝中，根据操作类型执行添加或替换键值。
-    如果add_new_key为True，则添加新键；如果replacement_dict不为空，则替换值。
-    如果在replacement_dict中找不到值，则尝试使用"未知"键的值（如果存在）。
-
-    :param data_list: 包含字典的列表，每个字典可能包含操作所涉及的键
-    :param key_operation: 操作类型，'replace'表示替换值，'add'表示添加新键
-    :param key_source: 当操作为替换时，用于查找值的键；当操作为添加时，用于获取值的键
-    :param replacement_dict: 仅当操作为替换时使用，用于映射替换值的字典
-    :param add_new_key: 是否添加新键，默认False
-    :param new_key_name: 添加新键时使用的键名
-    :return: 修改后的字典列表的深拷贝
+    给定年、月、日，返回对应的星期几。
+    星期一为0，星期日为6。
     """
-    new_data_list = copy.deepcopy(data_list)
-
-    for dictionary in new_data_list:
-        if key_operation == 'replace' and replacement_dict is not None and key_source in dictionary:
-            original_value = dictionary[key_source]
-            if original_value in replacement_dict:
-                dictionary[key_source] = replacement_dict[original_value]
-        elif key_operation == 'add' and add_new_key and key_source in dictionary and new_key_name is not None:
-            original_value = dictionary[key_source]
-            new_value = replacement_dict.get(original_value, dictionary.get("未知", original_value))
-            dictionary[new_key_name] = new_value
-
-    return new_data_list
+    date = datetime(year, month, day)
+    weekday = date.weekday()
+    weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+    return weekdays[weekday]
 
 
 class weather_iaqamg:
@@ -63,21 +78,65 @@ class weather_iaqamg:
         pass
 
     def get_weather_getimg_data(self, data, api_name):
-        if api_name == 'AMAP':
+        if api_name == "AMAP":
             _eventual_data["base"] = data["base"]
-            _eventual_data["base"]["weather-img"] = img_svg_data[data["base"]["weather"]]
+            _eventual_data["base"]["temp"] = data["base"]["temperature"]
+            _eventual_data["base"]["obsTime"] = data["base"]["reporttime"]
+            _eventual_data["base"]["weather_img"] = f'<div class="weather-image qi-{icon.get(data["base"].get("weather", "未知"), "999")}"></div>'
             blockdata = f'''
-            <div class="humidness">
-                <div class="humidness-image"></div>
+            <div class="weather-forecast weather-forecast-amap">
+            <div class="weather-chunk">
+                <div class="w-image qi-low-humidity2"></div>
                 <div class="humidness-data">{data["base"]["humidity"]}%</div>
             </div>
-            <div class="wind">
-                <div class="wind-image"></div>
+            <div class="weather-chunk">
+                <div class="w-image qi-wind-chill-advisory"></div>
                 <div class="wind-data">{data["base"]["winddirection"]}风<span>{data["base"]["windpower"]}</span></div>
             </div>
+            </div>
             '''
-            _eventual_data["base"]["blockdata"] = blockdata.replace('\n', '')
+            _eventual_data["base"]["blockdata"] = blockdata.replace("\n", "")
             _eventual_data["all"] = data["all"]
-            _eventual_data["all"] = add_or_replace_key_in_dicts(_eventual_data["all"], 'replace', "week", _week, add_new_key=False)
-            _eventual_data["all"] = add_or_replace_key_in_dicts(_eventual_data["all"], "add", "dayweather", list_svg_data, add_new_key=True, new_key_name="weather_list_image")
+            for amap in _eventual_data["all"]:
+                year, month, day = map(int, amap["date"].split("-"))
+                amap["week"] = infer_weekday(year, month, day)
+                amap["weather_list_image"] = f'<div class="weather-list-image qi-{icon.get(amap["dayweather"], "999")}"></div>'
+                amap["temp_range"] = f'{amap["nighttemp"]}℃~{amap["daytemp"]}℃'
+            return _eventual_data
+        elif api_name == "QWEATHER":
+            _eventual_data["base"] = data["base"]
+            _eventual_data["base"]["weather"] = data["base"]["text"]
+            _eventual_data["base"]["weather_img"] = f'<div class="weather-image qi-{icon.get(data["base"].get("text", "未知"), "999")}"></div>'
+            blockdata = f'''
+            <div class="weather-forecast weather-forecast-qweather">
+                <div class="weather-chunk">
+                    <div class="w-image qi-low-humidity2"></div>
+                    <div class="humidness-data">{data["base"].get("humidity", "未知")}%</div>
+                </div>
+                <div class="weather-chunk">
+                    <div class="w-image qi-wind-chill-advisory"></div>
+                    <div class="wind-data">{data["base"].get("windDir", "未知")}<span>{data["base"].get("windScale", "未知")}级</span></div>
+                </div>
+                <div class="weather-chunk">
+                    <div class="w-image qi-high-temperature3"></div>
+                    <div class="humidness-data">体感：{data["base"].get("feelsLike", "未知")}℃</div>
+                </div>
+                <div class="weather-chunk">
+                    <div class="w-image xj-pressure"></div>
+                    <div class="humidness-data">气压：{data["base"].get("pressure", "未知")}hPa</div>
+                </div>
+                <div class="weather-chunk">
+                    <div class="w-image xj-visibility"></div>
+                    <div class="humidness-data">能见度：{data["base"].get("vis", "未知")}/km</div>
+                </div>
+                </div>
+            '''
+            _eventual_data["base"]["blockdata"] = blockdata.replace("\n", "")
+            _eventual_data["all"] = data["all"]
+            for item in _eventual_data["all"]:
+                year, month, day = map(int, item["fxDate"].split("-"))
+                item["week"] = infer_weekday(year, month, day)
+                item["weather_list_image"] = f'<div class="weather-list-image qi-{icon.get(item["textDay"], "999")}"></div>'
+                item["date"] = item["fxDate"]
+                item["temp_range"] = f'{item["tempMin"]}℃~{item["tempMax"]}℃'
             return _eventual_data

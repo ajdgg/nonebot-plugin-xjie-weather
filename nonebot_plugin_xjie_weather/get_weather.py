@@ -52,8 +52,7 @@ async def amap_get_weather(city_name: str, key: str):
     forecast_data = weather_json["forecasts"][0]["casts"]
 
     # bot_sc = '===| ' + city_name + '天气 |===\n-----[ 今天 ]-----\n' + second_day_info_A['date'] + '\n星期' + second_day_info_A['week'] + '\n早：' + second_day_info_A['dayweather'] + '\n' + '晚：' + second_day_info_A['dayweather'] + '\n' + '温度：' + second_day_info_A['nighttemp'] + '~' + second_day_info_A['daytemp'] + '\n-----[ 明天 ]-----\n' + second_day_info_B['date'] + '\n星期' + second_day_info_B['week'] + '\n早：' + second_day_info_B['dayweather'] + '\n' + '晚：' + second_day_info_B['dayweather'] + '\n' + '温度：' + second_day_info_B['nighttemp'] + '~' + second_day_info_B['daytemp']
-    img_data = await weather_img.get_weather_img(forecast_data, gd_theresultobtained_base_data, "AMAP")
-    print(img_data)
+    img_data = await weather_img.get_weather_img(forecast_data, gd_theresultobtained_base_data, "AMAP", city_name)
     return img_data
 
 
@@ -70,23 +69,26 @@ def qweather_get_location(city_name: str, key: str):
     return coding_json['location'][0]['id']
 
 
-def qweather_get_weather(city: set, key: str):
+async def qweather_get_weather(city: set, key: str):
     location_data = qweather_get_location(city, key)
-    qweather_url = 'https://devapi.qweather.com/v7/weather/3d'
-    weather_url = f'{qweather_url}?location={location_data}&key={key}'
-    gd_city_location = xj_requests.xj_requests_main(weather_url)
-    weather_json = gd_city_location.json()
-    xiangy = weather_json.get('code')
-    if xiangy != '200':
-        return ["error", '获取天气失败']
+    qweather_url = 'https://devapi.qweather.com/v7/weather/'
+    weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
+    hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
+
+    hf_city_location = xj_requests.xj_requests_main(weather_url)
+    weather_json = hf_city_location.json()
     forecast_data = weather_json["daily"]
-    json = {"a": "123"}
-    # second_day_info_A = forecast_data[0]
-    # second_day_info_B = forecast_data[1]
+
+    hf_city_location_base = xj_requests.xj_requests_main(hf_weather_url)
+    weather_json = hf_city_location_base.json()
+    weather_data_base = weather_json["now"]
+
+    if weather_json.get('code') != '200' or weather_json.get('code') != '200':
+        return ["error", '获取天气失败']
+
     # bot_sc = '===| ' + city + '天气 |===\n-----[ 今天 ]-----\n' + second_day_info_A['fxDate'] + '\n早：' + second_day_info_A['textDay'] + '\n' + '晚：' + second_day_info_A['textNight'] + '\n' + '温度：' + second_day_info_A['tempMax'] + '~' + second_day_info_A['tempMin'] + '\n-----[ 明天 ]-----\n' + second_day_info_B['fxDate'] + '\n早：' + second_day_info_B['textDay'] + '\n' + '晚：' + second_day_info_B['textNight'] + '\n' + '温度：' + second_day_info_B['tempMax'] + '~' + second_day_info_B['tempMin']
-    a = weather_img.get_weather_img(forecast_data, json, 'qweather')
-    print(a, "1234")
-    return a
+    img_data = await weather_img.get_weather_img(forecast_data, weather_data_base, 'QWEATHER', city)
+    return img_data
 
 
 def select_get_platform(city, key, platform):
