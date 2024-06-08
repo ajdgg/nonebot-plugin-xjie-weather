@@ -4,17 +4,17 @@
 
 进入[高德开发平台 https://lbs.amap.com](https://lbs.amap.com/)
 
-![gd-1.png](https://www.freeimg.cn/i/2024/06/09/66648da426076.png)
+![](https://www.freeimg.cn/i/2024/06/09/66648da426076.png)
 
 登录或注册账号后进入控制台
 
 依次点击应用管理 -> 我的应用 -> 右上角创建新应用
 
-![gd-2.png](https://www.freeimg.cn/i/2024/06/09/66648da284175.png)
+![](https://www.freeimg.cn/i/2024/06/09/66648da284175.png)
 
 选择web服务后填写信息即可创建key
 
-![gd-3.png](https://www.freeimg.cn/i/2024/06/09/66648f0eb8b52.png)
+![](https://www.freeimg.cn/i/2024/06/09/66648f0eb8b52.png)
 
 创建完成后即可在控制台查看key
 
