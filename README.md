@@ -55,7 +55,8 @@ default_api     优先使用的平台
 
 手动填入的话平台名为上面的key名
 ```
-![](https://www.freeimg.cn/i/2024/06/08/6664606407e72.png)
+<img src="https://www.freeimg.cn/i/2024/06/08/6664606407e72.png" alt="gd-4.png" title="gd-4.png" />
+
 
 # 平台key获取
  [📦 高德](/amap.md)
@@ -70,9 +71,9 @@ default_api     优先使用的平台
 
 毕竟高德调用的次数挺多的
 
-![](https://www.freeimg.cn/i/2024/06/09/66649014c179e.png)
+<img src="https://www.freeimg.cn/i/2024/06/09/66649014c179e.png" alt="gd-4.png" title="gd-4.png" />
 
 ## 和风天气
 好看
 
-![](https://www.freeimg.cn/i/2024/06/09/66649228a6662.png)
+<img src="https://www.freeimg.cn/i/2024/06/09/66649228a6662.png" alt="hf-1.png" title="hf-1.png" />
