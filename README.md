@@ -55,7 +55,7 @@ default_api     优先使用的平台
 
 手动填入的话平台名为上面的key名
 ```
-<img src="https://www.freeimg.cn/i/2024/06/08/6664606407e72.png" alt="gd-4.png" title="gd-4.png" />
+![st](./static/pz-bot-key.png)
 
 
 # 平台key获取
@@ -71,9 +71,9 @@ default_api     优先使用的平台
 
 毕竟高德调用的次数挺多的
 
-<img src="https://www.freeimg.cn/i/2024/06/09/66649014c179e.png" alt="gd-4.png" title="gd-4.png" />
+![高德](./static/gd-4.png)
 
 ## 和风天气
 好看
 
-<img src="https://www.freeimg.cn/i/2024/06/09/66649228a6662.png" alt="hf-1.png" title="hf-1.png" />
+![和风](./static/hf-1.png)
