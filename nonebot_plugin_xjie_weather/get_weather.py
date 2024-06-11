@@ -41,13 +41,11 @@ async def amap_get_weather(city_name: str, key: str):
 
     weather_data = await xj_requests.xj_requests_main(weather_url)
     weather_json = weather_data.json()
-    YZ_weather = weather_json['status'][0]
 
     weather_data_base = await xj_requests.xj_requests_main(gd_wather_base_url)
     gd_theresultobtained_base = weather_data_base.json()
-    YZ_weather_base = gd_theresultobtained_base['status'][0]
 
-    if YZ_weather == 0 or YZ_weather_base == 0:
+    if weather_json.get('status') == 0 or gd_theresultobtained_base.get('status') == 0:
         print('获取天气失败', weather_json.get('info'))
     gd_theresultobtained_base_data = gd_theresultobtained_base['lives'][0]
     forecast_data = weather_json["forecasts"][0]["casts"]

@@ -4,12 +4,14 @@ from nonebot.adapters import Message
 from nonebot.matcher import Matcher
 from .file_handle import xj_file_handle
 from .get_weather import get_weather
-from nonebot import on_command, on_message, get_bot
+from nonebot import on_command, on_message, get_bot, require
 from nonebot.rule import to_me
 from nonebot.params import CommandArg, ArgPlainText
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+
+require("nonebot_plugin_alconna")
 
 from nonebot_plugin_alconna import UniMessage
 
