@@ -17,7 +17,7 @@ from nonebot_plugin_alconna import UniMessage
 
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-xjie-weather",
-    description="一个小小的天气插件",
+    description="一个小小的天气插件，使用图片返回天气信息",
     usage="目前支持和风天气和高德地图的天气api",
     type="application",
     homepage="https://github.com/ajdgg/nonebot-plugin-xjie-weather",
