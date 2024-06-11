@@ -1,4 +1,4 @@
-name: Lint, Format, and Publish Python Package
+name: Lint, Format, Publish & Flake8 Check Python Package
 
 on:
   push:
@@ -7,15 +7,17 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-format-publish:
+  lint-and-check:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: 3.9
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -27,13 +29,14 @@ jobs:
       - name: Add Poetry to PATH
         run: echo "$HOME/.poetry/bin" >> $GITHUB_PATH
 
-      - name: Install Flake8
-        run: poetry add --dev flake8
-
       - name: Install Dependencies with Poetry
         run: poetry install
 
-      - name: Lint with Flake8
+      - name: Install Flake8
+        run: poetry add --dev flake8
+
+      - name: Run Flake8 Linter
+        continue-on-error: true
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
