@@ -14,10 +14,10 @@ def a_qf(arrt):
 
 
 # 高德获取城市编码
-def amap_get_adcode(city_name: str, key: str):
+async def amap_get_adcode(city_name: str, key: str):
     placen_url = 'https://restapi.amap.com/v3/geocode/geo'
     get_place_url = f'{placen_url}?key={key}&city={city_name}&address={city_name}&output=JSON'
-    gd_city_adcode = xj_requests.xj_requests_main(get_place_url)
+    gd_city_adcode = await xj_requests.xj_requests_main(get_place_url)
     if gd_city_adcode is None:
         raise ValueError("Failed to send request")
     coding_json = gd_city_adcode.json()
@@ -32,20 +32,21 @@ def amap_get_adcode(city_name: str, key: str):
 
 # 高德获取天气
 async def amap_get_weather(city_name: str, key: str):
-    city_adcode = amap_get_adcode(city_name, key)
+    city_adcode = await amap_get_adcode(city_name, key)
     if isinstance(city_adcode, list):
         return city_adcode
     weathe_url = 'https://restapi.amap.com/v3/weather/weatherInfo'
     weather_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=all'
     gd_wather_base_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=base'
 
-    weather_data = xj_requests.xj_requests_main(weather_url)
+    weather_data = await xj_requests.xj_requests_main(weather_url)
     weather_json = weather_data.json()
     YZ_weather = weather_json['status'][0]
 
-    weather_data_base = xj_requests.xj_requests_main(gd_wather_base_url)
+    weather_data_base = await xj_requests.xj_requests_main(gd_wather_base_url)
     gd_theresultobtained_base = weather_data_base.json()
     YZ_weather_base = gd_theresultobtained_base['status'][0]
+
     if YZ_weather == 0 or YZ_weather_base == 0:
         print('获取天气失败', weather_json.get('info'))
     gd_theresultobtained_base_data = gd_theresultobtained_base['lives'][0]
@@ -56,10 +57,10 @@ async def amap_get_weather(city_name: str, key: str):
     return img_data
 
 
-def qweather_get_location(city_name: str, key: str):
+async def qweather_get_location(city_name: str, key: str):
     location = 'https://geoapi.qweather.com/v2/city/lookup'
     location_url = f'{location}?location={city_name}&key={key}'
-    gd_city_adcode = xj_requests.xj_requests_main(location_url)
+    gd_city_adcode = await xj_requests.xj_requests_main(location_url)
     if gd_city_adcode is None:
         raise ValueError("Failed to send request")
     coding_json = gd_city_adcode.json()
@@ -70,16 +71,18 @@ def qweather_get_location(city_name: str, key: str):
 
 
 async def qweather_get_weather(city: set, key: str):
-    location_data = qweather_get_location(city, key)
+    location_data = await qweather_get_location(city, key)
     qweather_url = 'https://devapi.qweather.com/v7/weather/'
     weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
     hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
 
-    hf_city_location = xj_requests.xj_requests_main(weather_url)
+    # hf_city_location = xj_requests.xj_requests_main(weather_url)
+    hf_city_location = await xj_requests.xj_requests_main(weather_url)
     weather_json = hf_city_location.json()
     forecast_data = weather_json["daily"]
 
-    hf_city_location_base = xj_requests.xj_requests_main(hf_weather_url)
+    # hf_city_location_base = xj_requests.xj_requests_main(hf_weather_url)
+    hf_city_location_base = await xj_requests.xj_requests_main(hf_weather_url)
     weather_json = hf_city_location_base.json()
     weather_data_base = weather_json["now"]
 

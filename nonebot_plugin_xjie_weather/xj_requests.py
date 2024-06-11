@@ -1,37 +1,22 @@
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+import httpx
 
 
 class xj_requests:
     def __init__(self):
-        self.session = requests.Session()
-        retry_strategy = Retry(
-            total=3,
-            backoff_factor=1,  # 延迟时间
-            status_forcelist=[500, 502, 503, 504],
-            allowed_methods=["GET"]
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        self.session.mount("http://", adapter)
-        self.session.mount("https://", adapter)
-        pass
+        self.client = httpx.AsyncClient(timeout=httpx.Timeout(10.0))
 
-    def xj_requests_main(self, place_url):
+    async def xj_requests_main(self, place_url):
         try:
-            response = self.session.get(place_url, timeout=10)
+            response = await self.client.get(place_url)
             response.raise_for_status()
+            print(response.status_code, "212")
             return response
-        except requests.exceptions.RequestException as err:
-            if isinstance(err, requests.exceptions.Timeout):
-                print("Request timed out.")
-                return None
-            elif isinstance(err, requests.exceptions.ConnectionError):
-                print("Connection error occurred.")
-                return None
-            elif isinstance(err, requests.exceptions.HTTPError):
-                print(f"HTTP error occurred: {err}")
-                return None
-            else:
-                print(f"Other error occurred: {err}")
-                return None
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e}")
+            return None
+        except (httpx.ConnectError, httpx.ReadTimeout) as e:
+            # 直接抛出与延时相关的错误
+            raise Exception(f"Connection or timeout error: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return None

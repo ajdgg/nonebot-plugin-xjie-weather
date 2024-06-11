@@ -1,16 +1,15 @@
 import asyncio
 from pathlib import Path
 from nonebot.adapters import Message
+from nonebot.matcher import Matcher
 from .file_handle import xj_file_handle
 from .get_weather import get_weather
-from nonebot import on_command, on_message, get_bot, require
+from nonebot import on_command, on_message, get_bot
 from nonebot.rule import to_me
 from nonebot.params import CommandArg, ArgPlainText
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
-from nonebot.plugin import PluginMetadata
-
-require("nonebot_plugin_alconna")
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 from nonebot_plugin_alconna import UniMessage
 
@@ -20,6 +19,7 @@ __plugin_meta__ = PluginMetadata(
     usage="目前支持和风天气和高德地图的天气api",
     type="application",
     homepage="https://github.com/ajdgg/nonebot-plugin-xjie-weather",
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
 
 _time_a = {}
@@ -196,7 +196,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                             print(f"索引 {int(args)} 无效，列表长度为 {len(keys_ending_with_KEY)}")
                             await xj_weather.finish("输入错误，请重新输入")
 
-                        await xj_configuration_responsive.send(f"请121输入{a_data}的key")
+                        await xj_configuration_responsive.send(f"请输入{a_data}的key")
 
                         _configuration_option["X_KEY"] = a_data
                         _configuration_option["SF"] = True
@@ -205,7 +205,7 @@ async def configuration_responsive(bot: Bot, event: Event):
             else:
                 keys_with_indices = [(index + 1, key) for index, key in enumerate(keys_ending_with_KEY)]
                 keys_string = "\n".join(f"[{index}] {key}" for index, key in keys_with_indices)
-                await xj_configuration_responsive.send(f"请选择要2121设置的key\n{keys_string}")
+                await xj_configuration_responsive.send(f"请选择要设置的key\n{keys_string}")
 
                 _configuration_option["SG"] = True
         elif args == 'two' or _configuration_option.get("SL", '') == '2':
@@ -250,17 +250,9 @@ async def bot_self_inspection():
 
 
 @xj_weather.handle()
-async def handle_first_receive(args: Message = CommandArg()):
-    if xj_user_message := args.extract_plain_text():
-        path = Path(__file__).parent / "weatherforecast.png"
-        if _get_default_platform["mr"] != '':
-            bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
-            if bot_result == '200':
-                await UniMessage.image(path=path).send()
-        else:
-            bot_result = await get_weather.xj_get_weather_main(xj_user_message)
-            if bot_result == '200':
-                await UniMessage.image(path=path).send()
+async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text():
+        matcher.set_arg("xj_user_message", args)
 
 
 @xj_weather.got("xj_user_message", prompt="请输入地名")
