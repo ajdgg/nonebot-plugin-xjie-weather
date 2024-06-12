@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths-ignore:
+      - '**/*.md'
     condition: contains(github.event.head_commit.message, '#tag')
 
 jobs:
@@ -16,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.x # 根据您的需求选择Python版本
+        python-version: 3.x
 
     - name: Install dependencies and build
       run: |
