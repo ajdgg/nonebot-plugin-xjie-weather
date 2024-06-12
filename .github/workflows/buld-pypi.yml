@@ -1,35 +1,31 @@
-name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+name: Publish to PyPI
 
 on:
-  push
+  push:
+    branches: [main]
+    paths-ignore:
+    condition: contains(github.event.head_commit.message, '#tag')
 
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
-    runs-on: ubuntu-18.04
+  build-and-publish:
+    runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@master
-        - name: Set up Python 3.7
-          uses: actions/setup-python@v1
-          with:
-            python-version: 3.7
-        - name: Install pypa/build
-          run: >-
-            python -m
-            pip install
-            build
-            --user
-        - name: Build a binary wheel and a source tarball
-          run: >-
-            python -m
-            build
-            --sdist
-            --wheel
-            --outdir dist/
-            .
-        - name: Publish distribution 📦 to PyPI
-          if: startsWith(github.ref, 'refs/tags')
-          uses: pypa/gh-action-pypi-publish@master
-          with:
-              password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v3
 
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.x # 根据您的需求选择Python版本
+
+    - name: Install dependencies and build
+      run: |
+        pip install --upgrade pip setuptools wheel twine
+        python setup.py sdist bdist_wheel
+
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        twine upload dist/*
