@@ -55,7 +55,7 @@ xj_no = [
     'N0',
 ]
 
-dz = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+entrance_on = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
 get_weather = get_weather()
 xj_file_handle = xj_file_handle()
@@ -160,7 +160,7 @@ async def configuration_responsive(bot: Bot, event: Event):
         if _configuration_option["ground-floor"] and is_integer_not_float(args):
 
             try:
-                args = dz[int(args)]
+                args = entrance_on[int(args)]
                 print(args)
             except IndexError:
                 await xj_weather.finish("输入错误，请重新输入")
