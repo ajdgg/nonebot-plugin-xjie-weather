@@ -17,7 +17,7 @@ from nonebot_plugin_alconna import UniMessage
 
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-xjie-weather",
-    description="一个小小的天气插件，使用图片返回天气信息",
+    description="一个小小的天气插件",
     usage="目前支持和风天气和高德地图的天气api",
     type="application",
     homepage="https://github.com/ajdgg/nonebot-plugin-xjie-weather",
@@ -55,7 +55,7 @@ xj_no = [
     'N0',
 ]
 
-entrance_on = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+dz = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
 get_weather = get_weather()
 xj_file_handle = xj_file_handle()
@@ -160,7 +160,7 @@ async def configuration_responsive(bot: Bot, event: Event):
         if _configuration_option["ground-floor"] and is_integer_not_float(args):
 
             try:
-                args = entrance_on[int(args)]
+                args = dz[int(args)]
                 print(args)
             except IndexError:
                 await xj_weather.finish("输入错误，请重新输入")
@@ -264,7 +264,13 @@ async def got_location(xj_user_message: str = ArgPlainText()):
         bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
         if bot_result == '200':
             await UniMessage.image(path=path).send()
+        elif isinstance(bot_result, list):
+            if bot_result[0] == "error":
+                await xj_weather.finish(bot_result[1])
     else:
         bot_result = await get_weather.xj_get_weather_main(xj_user_message)
         if bot_result == '200':
             await UniMessage.image(path=path).send()
+        elif isinstance(bot_result, list):
+            if bot_result[0] == "error":
+                await xj_weather.finish(bot_result[1])

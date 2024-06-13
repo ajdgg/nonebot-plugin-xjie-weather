@@ -53,7 +53,9 @@ class weather_img:
             hasd = weather_html(data_ha, city)
             if hasd == "200":
                 await open_local_html()
-            return "200"
+                return "200"
+            else:
+                return ["error", "生成html失败"]
         elif api_name == "QWEATHER":
             _data_obj["base"] = data_base
             _data_obj["all"] = data_all
@@ -61,4 +63,6 @@ class weather_img:
             hasd = weather_html(data_ha, city)
             if hasd == "200":
                 await open_local_html()
-            return "200"
+                return "200"
+            else:
+                return ["error", "生成html失败"]
