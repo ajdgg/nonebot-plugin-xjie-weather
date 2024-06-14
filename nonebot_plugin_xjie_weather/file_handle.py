@@ -12,11 +12,18 @@ class xj_file_handle:
 
     def xj_file_reading(self, file_name: str, file_content: str = None):
         json_file_path_reading = file_path(file_name)
-        with json_file_path_reading.open("r", encoding="utf-8") as json_file:
-            loaded_data = json.load(json_file)
-        if file_content is None:
-            return loaded_data
-        return loaded_data.get(file_content, None)
+        try:
+            with json_file_path_reading.open("r", encoding="utf-8") as json_file:
+                loaded_data = json.load(json_file)
+            if file_content is None:
+                return loaded_data
+            return loaded_data.get(file_content, None)
+        except FileNotFoundError:
+            print(f"File not found: {file_name}")
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON from the file: {file_name}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
     def xj_file_change(self, file_name: str, file_key: str, file_content: str):
         json_file_path_change = file_path(file_name)
@@ -40,11 +47,27 @@ class xj_file_handle:
             print(f"写入文件时发生错误: {e}")
 
     def get_keys_ending_with_key(self, json_data, key_suffix='_KEY'):
-        json_file_path_reading = file_path(json_data)
-        with json_file_path_reading.open("r", encoding="utf-8") as json_file:
-            loaded_data = json.load(json_file)
+        try:
+            json_file_path_reading = file_path(json_data)
+
+            with open(json_file_path_reading, "r", encoding="utf-8") as json_file:
+                loaded_data = json.load(json_file)
+
+        except FileNotFoundError:
+            print(f"Error: The file {json_file_path_reading} was not found.")
+            return None
+
+        except json.JSONDecodeError:
+            print(f"Error: Failed to decode JSON from file {json_file_path_reading}.")
+            return None
+
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return None
+
         result = {}
         for key in loaded_data.keys():
             if key.endswith(key_suffix) and loaded_data[key]:
                 result[key] = loaded_data[key]
+
         return result
