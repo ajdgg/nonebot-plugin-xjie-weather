@@ -1,6 +1,7 @@
 {
     "AMAP_KEY": "",
     "QWEATHER_KEY": "",
+    "QWEATHER_APITYPE": 0,
     "default_api": "",
     "admin_whitelist": ""
 }

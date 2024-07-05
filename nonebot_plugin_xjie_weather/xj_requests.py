@@ -1,4 +1,5 @@
 import httpx
+from typing import Dict, Any
 
 
 class xj_requests:
@@ -9,9 +10,9 @@ class xj_requests:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.client.aclose()
 
-    async def xj_requests_main(self, place_url):
+    async def xj_requests_main(self, url: str, params: Dict[str, Any] = None, headers: Dict[str, str] = None) -> httpx.Response:
         try:
-            response = await self.client.get(place_url)
+            response = await self.client.get(url, params=params, headers=headers)
             response.raise_for_status()
             print(response.status_code, "请求成功")
             return response

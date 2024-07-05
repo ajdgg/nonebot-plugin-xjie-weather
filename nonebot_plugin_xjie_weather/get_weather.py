@@ -7,6 +7,14 @@ xj_file_handle = xj_file_handle()
 key_data = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
 
 
+def a():
+    QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")
+    if QWEATHER_APITYPE == 0:
+        return 'https://devapi.qweather.com/v7/weather/'
+    else:
+        return 'https://api.qweather.com/v7/weather/'
+
+
 async def fetch_data(url):
     async with xj_requests() as xj:
         return await xj.xj_requests_main(url)
@@ -61,6 +69,7 @@ async def amap_get_weather(city_name: str, key: str):
     return img_data
 
 
+# 和风
 async def qweather_get_location(city_name: str, key: str):
     location = 'https://geoapi.qweather.com/v2/city/lookup'
     location_url = f'{location}?location={city_name}&key={key}'
