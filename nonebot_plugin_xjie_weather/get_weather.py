@@ -21,7 +21,7 @@ async def fetch_data(url):
 
 def a_qf():
     key_data = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
-    a = list(key_data)
+    a = list(key_data.items())
     first_key, first_value = a[0]
     return [first_key, first_value]
 
