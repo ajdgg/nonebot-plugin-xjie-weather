@@ -7,7 +7,7 @@ xj_file_handle = xj_file_handle()
 key_data = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
 
 
-def a():
+def qweather_return_url():
     QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")
     if QWEATHER_APITYPE == 0:
         return 'https://devapi.qweather.com/v7/weather/'
@@ -85,7 +85,7 @@ async def qweather_get_location(city_name: str, key: str):
 
 async def qweather_get_weather(city: set, key: str):
     location_data = await qweather_get_location(city, key)
-    qweather_url = 'https://devapi.qweather.com/v7/weather/'
+    qweather_url = qweather_return_url()
     weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
     hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
 
