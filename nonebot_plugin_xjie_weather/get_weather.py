@@ -4,7 +4,6 @@ from .main import weather_img
 weather_img = weather_img()
 # xj_requests = xj_requests()
 xj_file_handle = xj_file_handle()
-key_data = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
 
 
 def qweather_return_url():
@@ -20,8 +19,9 @@ async def fetch_data(url):
         return await xj.xj_requests_main(url)
 
 
-def a_qf(arrt):
-    a = list(arrt.items())
+def a_qf():
+    key_data = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
+    a = list(key_data)
     first_key, first_value = a[0]
     return [first_key, first_value]
 
@@ -110,7 +110,7 @@ def select_get_platform(city, key, platform):
         return amap_get_weather(city, key)
     elif platform == "QWEATHER_KEY":
         return qweather_get_weather(city, key)
-    return key_data
+    return
 
 
 class get_weather:
@@ -119,7 +119,7 @@ class get_weather:
 
     def xj_get_weather_main(self, city_name: str, get_default_platform: str = None):
         if get_default_platform is None or get_default_platform == '':
-            MR_AP = a_qf(key_data)
+            MR_AP = a_qf()
             return select_get_platform(city_name, MR_AP[1], MR_AP[0])
         else:
             a_data = xj_file_handle.xj_file_reading("xjie_data.json", get_default_platform)

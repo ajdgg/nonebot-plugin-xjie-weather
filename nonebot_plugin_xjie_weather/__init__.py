@@ -180,6 +180,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                     x_data = _configuration_option["X_KEY"]
                     xj_file_handle.xj_file_change("xjie_data.json", x_data, args)
                     await xj_configuration_responsive.send("配置成功")
+                    _get_default_platform["xjie_data"] = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
 
                     _time_a["t"] = False
                     _configuration_option["ground-floor"] = True
