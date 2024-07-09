@@ -91,7 +91,7 @@ class weather_iaqamg:
             </div>
             <div class="weather-chunk">
                 <div class="w-image qi-wind-chill-advisory"></div>
-                <div class="wind-data">{data["base"]["winddirection"]}风<span>{data["base"]["windpower"]}</span></div>
+                <div class="wind-data">{data["base"]["winddirection"]}风<span>{data["base"]["windpower"]}级</span></div>
             </div>
             </div>
             '''

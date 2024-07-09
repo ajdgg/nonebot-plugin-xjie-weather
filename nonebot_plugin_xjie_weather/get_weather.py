@@ -1,22 +1,12 @@
-from .xj_requests import xj_requests
 from .file_handle import xj_file_handle
+from .wx_info.amap import AMAP
+from .wx_info.qweather import QWEATHER
 from .main import weather_img
 weather_img = weather_img()
 # xj_requests = xj_requests()
+AMAP = AMAP()
+QWEATHER = QWEATHER()
 xj_file_handle = xj_file_handle()
-
-
-def qweather_return_url():
-    QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")
-    if QWEATHER_APITYPE == 0:
-        return 'https://devapi.qweather.com/v7/weather/'
-    else:
-        return 'https://api.qweather.com/v7/weather/'
-
-
-async def fetch_data(url):
-    async with xj_requests() as xj:
-        return await xj.xj_requests_main(url)
 
 
 def a_qf():
@@ -26,91 +16,18 @@ def a_qf():
     return [first_key, first_value]
 
 
-# 高德获取城市编码
-async def amap_get_adcode(city_name: str, key: str):
-    placen_url = 'https://restapi.amap.com/v3/geocode/geo'
-    get_place_url = f'{placen_url}?key={key}&city={city_name}&address={city_name}&output=JSON'
-    gd_city_adcode = await fetch_data(get_place_url)
-    if gd_city_adcode is None:
-        print(ValueError("Failed to send request"))
-        return ["error", "获取城市编码失败"]
-    coding_json = gd_city_adcode.json()
-    xiangy = coding_json.get('status')
-    if xiangy == 0:
-        return ["error", coding_json["info"]]
-    adcode = coding_json["geocodes"][0]["adcode"]
-    if adcode is None:
-        return ["error", "错误"]
-    return adcode
+select_get_platform_s = {
+    "AMAP_KEY": AMAP.amap_get_weather,
+    "QWEATHER_KEY": QWEATHER.qweather_get_weather,
+}
 
 
-# 高德获取天气
-async def amap_get_weather(city_name: str, key: str):
-    city_adcode = await amap_get_adcode(city_name, key)
-    if isinstance(city_adcode, list):
-        return city_adcode
-    weathe_url = 'https://restapi.amap.com/v3/weather/weatherInfo'
-    weather_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=all'
-    gd_wather_base_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=base'
-
-    weather_data = await fetch_data(weather_url)
-    weather_json = weather_data.json()
-
-    weather_data_base = await fetch_data(gd_wather_base_url)
-    gd_theresultobtained_base = weather_data_base.json()
-
-    if weather_json.get('status') == 0 or gd_theresultobtained_base.get('status') == 0:
-        return ["error", '获取天气失败']
-    gd_theresultobtained_base_data = gd_theresultobtained_base['lives'][0]
-    forecast_data = weather_json["forecasts"][0]["casts"]
-
-    # bot_sc = '===| ' + city_name + '天气 |===\n-----[ 今天 ]-----\n' + second_day_info_A['date'] + '\n星期' + second_day_info_A['week'] + '\n早：' + second_day_info_A['dayweather'] + '\n' + '晚：' + second_day_info_A['dayweather'] + '\n' + '温度：' + second_day_info_A['nighttemp'] + '~' + second_day_info_A['daytemp'] + '\n-----[ 明天 ]-----\n' + second_day_info_B['date'] + '\n星期' + second_day_info_B['week'] + '\n早：' + second_day_info_B['dayweather'] + '\n' + '晚：' + second_day_info_B['dayweather'] + '\n' + '温度：' + second_day_info_B['nighttemp'] + '~' + second_day_info_B['daytemp']
-    img_data = await weather_img.get_weather_img(forecast_data, gd_theresultobtained_base_data, "AMAP", city_name)
-    return img_data
-
-
-# 和风
-async def qweather_get_location(city_name: str, key: str):
-    location = 'https://geoapi.qweather.com/v2/city/lookup'
-    location_url = f'{location}?location={city_name}&key={key}'
-    gd_city_adcode = await fetch_data(location_url)
-    if gd_city_adcode is None:
-        raise ValueError("Failed to send request")
-    coding_json = gd_city_adcode.json()
-    xiangy = coding_json.get('code')
-    if xiangy != '200':
-        return ["error", '获取城市编码失败']
-    return coding_json['location'][0]['id']
-
-
-async def qweather_get_weather(city: set, key: str):
-    location_data = await qweather_get_location(city, key)
-    qweather_url = qweather_return_url()
-    weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
-    hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
-
-    hf_city_location = await fetch_data(weather_url)
-    weather_json = hf_city_location.json()
-    forecast_data = weather_json["daily"]
-
-    hf_city_location_base = await fetch_data(hf_weather_url)
-    weather_json = hf_city_location_base.json()
-    weather_data_base = weather_json["now"]
-
-    if weather_json.get('code') != '200' or weather_json.get('code') != '200':
-        return ["error", '获取天气失败']
-
-    # bot_sc = '===| ' + city + '天气 |===\n-----[ 今天 ]-----\n' + second_day_info_A['fxDate'] + '\n早：' + second_day_info_A['textDay'] + '\n' + '晚：' + second_day_info_A['textNight'] + '\n' + '温度：' + second_day_info_A['tempMax'] + '~' + second_day_info_A['tempMin'] + '\n-----[ 明天 ]-----\n' + second_day_info_B['fxDate'] + '\n早：' + second_day_info_B['textDay'] + '\n' + '晚：' + second_day_info_B['textNight'] + '\n' + '温度：' + second_day_info_B['tempMax'] + '~' + second_day_info_B['tempMin']
-    img_data = await weather_img.get_weather_img(forecast_data, weather_data_base, 'QWEATHER', city)
-    return img_data
-
-
-def select_get_platform(city, key, platform):
-    if platform == "AMAP_KEY":
-        return amap_get_weather(city, key)
-    elif platform == "QWEATHER_KEY":
-        return qweather_get_weather(city, key)
-    return
+# def select_get_platform(city, key, platform):
+#     if platform == "AMAP_KEY":
+#         return AMAP.amap_get_weather(city, key)
+#     elif platform == "QWEATHER_KEY":
+#         return QWEATHER.qweather_get_weather(city, key)
+#     return
 
 
 class get_weather:
@@ -120,7 +37,11 @@ class get_weather:
     def xj_get_weather_main(self, city_name: str, get_default_platform: str = None):
         if get_default_platform is None or get_default_platform == '':
             MR_AP = a_qf()
-            return select_get_platform(city_name, MR_AP[1], MR_AP[0])
+            if MR_AP[0] not in select_get_platform_s:
+                return ["error", '未知平台']
+            return select_get_platform_s[MR_AP[0]](city_name, MR_AP[1])
         else:
             a_data = xj_file_handle.xj_file_reading("xjie_data.json", get_default_platform)
-            return select_get_platform(city_name, a_data, get_default_platform)
+            if get_default_platform not in select_get_platform_s:
+                return ["error", '未知平台']
+            return select_get_platform_s[get_default_platform](city_name, a_data)
