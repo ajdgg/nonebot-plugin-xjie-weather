@@ -11,6 +11,7 @@ from nonebot.params import CommandArg, ArgPlainText
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from .config import X_SUPERUSERS
 
 require("nonebot_plugin_alconna")
 
@@ -83,6 +84,24 @@ def is_integer_not_float(s: str) -> bool:
         return False
 
 
+def has_common_elements(list1: List, list2: List) -> bool:
+    set1 = set(list1)
+    set2 = set(list2)
+    return bool(set1 & set2)
+
+
+def convert_to_int_list(values) -> List:
+    try:
+        return [int(value) for value in values]
+    except ValueError:
+        return []
+
+
+def save_superusers(superusers):
+    superusers_str = ",".join(map(str, superusers))
+    xj_file_handle.xj_file_change("xjie_data.json", "admin_whitelist", superusers_str)
+
+
 def original(user_id):
     del _configuration_state[user_id]
     del _configuration_option["option"]
@@ -100,9 +119,14 @@ async def timeout_task(user_id):
         message = "您的操作已超时，会话 已结束。"
         await bot.send_private_msg(user_id=user_id, message=message)
 
-administrator = xj_file_handle.xj_file_reading("xjie_data.json", "admin_whitelist")
-if administrator != "":
-    _admin_whitelist = [int(num) for num in administrator.split(",")]
+try:
+    administrator = xj_file_handle.xj_file_reading("xjie_data.json", "admin_whitelist")
+    _admin_whitelist = convert_to_int_list(administrator.split(",")) if administrator else []
+
+    if not has_common_elements(X_SUPERUSERS, _admin_whitelist) or set(_admin_whitelist) != set(X_SUPERUSERS):
+        save_superusers(X_SUPERUSERS)
+except Exception as e:
+    print(f"Error processing administrator list: {e}")
 
 
 xj_setup = on_command("setup", aliases={"k"}, rule=to_me(), priority=10, block=True)
