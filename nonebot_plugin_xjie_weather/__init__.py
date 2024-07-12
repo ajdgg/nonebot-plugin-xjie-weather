@@ -64,7 +64,7 @@ def menu_dispose(list: List[str]) -> str:
         "[1] Option1
         [2] Option2"
     """
-    return "\n".join(f"[{i}] {func}" for i, func in enumerate(setup_function_list, start=1))
+    return "\n".join(f"[{i}] {func}" for i, func in enumerate(list, start=1))
 
 
 def is_integer_not_float(s: str) -> bool:
@@ -129,6 +129,40 @@ except Exception as e:
     print(f"Error processing administrator list: {e}")
 
 
+xj_weather = on_command("天气", rule=to_me(), priority=10, block=True)
+
+
+@xj_weather.handle()
+async def bot_self_inspection():
+    if not _get_default_platform["xjie_data"]:
+        await xj_weather.finish("无配置api未配置")
+
+
+@xj_weather.handle()
+async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text():
+        matcher.set_arg("xj_user_message", args)
+
+
+@xj_weather.got("xj_user_message", prompt="请输入地名")
+async def got_location(xj_user_message: str = ArgPlainText()):
+    path = Path(__file__).parent / "weatherforecast.png"
+    if _get_default_platform["mr"] != '':
+        bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
+        if bot_result == '200':
+            await UniMessage.image(path=path).send()
+        elif isinstance(bot_result, list):
+            if bot_result[0] == "error":
+                await xj_weather.finish(bot_result[1])
+    else:
+        bot_result = await get_weather.xj_get_weather_main(xj_user_message)
+        if bot_result == '200':
+            await UniMessage.image(path=path).send()
+        elif isinstance(bot_result, list):
+            if bot_result[0] == "error":
+                await xj_weather.finish(bot_result[1])
+
+# 设置部分
 xj_setup = on_command("setup", aliases={"k"}, rule=to_me(), priority=10, block=True)
 
 
@@ -277,36 +311,3 @@ async def configuration_responsive(bot: Bot, event: Event):
                 _configuration_option["SG"] = True
         else:
             await xj_setup_responsive.finish("输入错误")
-
-xj_weather = on_command("天气", rule=to_me(), priority=10, block=True)
-
-
-@xj_weather.handle()
-async def bot_self_inspection():
-    if not _get_default_platform["xjie_data"]:
-        await xj_weather.finish("无配置api未配置")
-
-
-@xj_weather.handle()
-async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
-    if args.extract_plain_text():
-        matcher.set_arg("xj_user_message", args)
-
-
-@xj_weather.got("xj_user_message", prompt="请输入地名")
-async def got_location(xj_user_message: str = ArgPlainText()):
-    path = Path(__file__).parent / "weatherforecast.png"
-    if _get_default_platform["mr"] != '':
-        bot_result = await get_weather.xj_get_weather_main(xj_user_message, _get_default_platform["mr"])
-        if bot_result == '200':
-            await UniMessage.image(path=path).send()
-        elif isinstance(bot_result, list):
-            if bot_result[0] == "error":
-                await xj_weather.finish(bot_result[1])
-    else:
-        bot_result = await get_weather.xj_get_weather_main(xj_user_message)
-        if bot_result == '200':
-            await UniMessage.image(path=path).send()
-        elif isinstance(bot_result, list):
-            if bot_result[0] == "error":
-                await xj_weather.finish(bot_result[1])

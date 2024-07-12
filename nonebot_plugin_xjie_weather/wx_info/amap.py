@@ -1,46 +1,74 @@
 from ..xj_requests import xj_requests
 from ..main import weather_img
+from typing import List
 
 
 weather_img = weather_img()
 
 
-async def fetch_data(url):
-    async with xj_requests() as xj:
-        return await xj.xj_requests_main(url)
-
-
-async def amap_get_adcode(city_name: str, key: str):
-    placen_url = 'https://restapi.amap.com/v3/geocode/geo'
-    get_place_url = f'{placen_url}?key={key}&city={city_name}&address={city_name}&output=JSON'
-    gd_city_adcode = await fetch_data(get_place_url)
-    if gd_city_adcode is None:
-        print(ValueError("Failed to send request"))
-        return ["error", "获取城市编码失败"]
-    coding_json = gd_city_adcode.json()
-    xiangy = coding_json.get('status')
-    if xiangy == 0:
-        return ["error", coding_json["info"]]
-    adcode = coding_json["geocodes"][0]["adcode"]
-    if adcode is None:
-        return ["error", "错误"]
-    return adcode
-
-
 # 高德获取天气
 class AMAP:
+    """
+    高德地图
+
+    获取高德地图城市编码
+        amap_get_adcode(city_name: str, key: str)
+
+    获取高德地图城市天气
+        amap_get_weather(city_name: str, key: str)
+    """
+    async def __fetch_data(self, url):
+        async with xj_requests() as xj:
+            return await xj.xj_requests_main(url)
+
+    async def amap_get_adcode(self, city_name: str, key: str) -> List:
+        """
+        async获取高德地图城市编码
+
+        参数:
+            city_name (str): 城市名字
+            key (str): 高德地图API的密钥。
+
+        返回:
+            Any: 请求的结果。返回的类型取决于服务器响应的内容。
+        """
+        placen_url = 'https://restapi.amap.com/v3/geocode/geo'
+        get_place_url = f'{placen_url}?key={key}&city={city_name}&address={city_name}&output=JSON'
+        gd_city_adcode = await self.__fetch_data(get_place_url)
+        if gd_city_adcode is None:
+            print(ValueError("Failed to send request"))
+            return ["error", "获取城市编码失败"]
+        coding_json = gd_city_adcode.json()
+        xiangy = coding_json.get('status')
+        if xiangy == 0:
+            return ["error", coding_json["info"]]
+        adcode = coding_json["geocodes"][0]["adcode"]
+        if adcode is None:
+            return ["error", "错误"]
+        return adcode
+
     async def amap_get_weather(self, city_name: str, key: str):
-        city_adcode = await amap_get_adcode(city_name, key)
+        """
+        async获取高德地图城市天气
+
+        参数:
+            city_name (str): 城市名字
+            key (str): 高德地图API的密钥。
+
+        返回:
+            Any: 请求的结果。返回的类型取决于服务器响应的内容。
+        """
+        city_adcode = await self.amap_get_adcode(city_name, key)
         if isinstance(city_adcode, list):
             return city_adcode
         weathe_url = 'https://restapi.amap.com/v3/weather/weatherInfo'
         weather_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=all'
         gd_wather_base_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=base'
 
-        weather_data = await fetch_data(weather_url)
+        weather_data = await self.__fetch_data(weather_url)
         weather_json = weather_data.json()
 
-        weather_data_base = await fetch_data(gd_wather_base_url)
+        weather_data_base = await self.__fetch_data(gd_wather_base_url)
         gd_theresultobtained_base = weather_data_base.json()
 
         if weather_json.get('status') == 0 or gd_theresultobtained_base.get('status') == 0:

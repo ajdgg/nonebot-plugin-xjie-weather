@@ -7,45 +7,71 @@ weather_img = weather_img()
 xj_file_handle = xj_file_handle()
 
 
-def qweather_return_url():
-    QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")
-    if QWEATHER_APITYPE == 0:
-        return 'https://devapi.qweather.com/v7/weather/'
-    else:
-        return 'https://api.qweather.com/v7/weather/'
-
-
-async def fetch_data(url):
-    async with xj_requests() as xj:
-        return await xj.xj_requests_main(url)
-
-
-# 和风
-async def qweather_get_location(city_name: str, key: str):
-    location = 'https://geoapi.qweather.com/v2/city/lookup'
-    location_url = f'{location}?location={city_name}&key={key}'
-    gd_city_adcode = await fetch_data(location_url)
-    if gd_city_adcode is None:
-        raise ValueError("Failed to send request")
-    coding_json = gd_city_adcode.json()
-    xiangy = coding_json.get('code')
-    if xiangy != '200':
-        return ["error", '获取城市编码失败']
-    return coding_json['location'][0]['id']
-
-
 class QWEATHER:
+    """
+    高德地图
+
+    获取和风天气城市编码
+        qweather_get_location(city_name: str, key: str)
+
+    获取和风天气城市天气
+        qweather_get_weather(city_name: str, key: str)
+    """
+    async def __fetch_data(self, url):
+        async with xj_requests() as xj:
+            return await xj.xj_requests_main(url)
+
+    def __qweather_return_url() -> str:
+        QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")
+        if QWEATHER_APITYPE == 0:
+            return 'https://devapi.qweather.com/v7/weather/'
+        else:
+            return 'https://api.qweather.com/v7/weather/'
+
+    # 和风
+    async def qweather_get_location(self, city_name: str, key: str):
+        """
+        async获取和风天气城市编码
+
+        参数:
+            city_name (str): 城市名字
+            key (str): 和风天气API的密钥。
+
+        返回:
+            Any: 请求的结果。返回的类型取决于服务器响应的内容。
+        """
+        location = 'https://geoapi.qweather.com/v2/city/lookup'
+        location_url = f'{location}?location={city_name}&key={key}'
+        gd_city_adcode = await self.__fetch_data(location_url)
+        if gd_city_adcode is None:
+            raise ValueError("Failed to send request")
+        coding_json = gd_city_adcode.json()
+        xiangy = coding_json.get('code')
+        if xiangy != '200':
+            return ["error", '获取城市编码失败']
+        return coding_json['location'][0]['id']
+
     async def qweather_get_weather(self, city: set, key: str):
-        location_data = await qweather_get_location(city, key)
-        qweather_url = qweather_return_url()
+        """
+        async获取和风天气城市天气
+
+        参数:
+            city_name (str): 城市名字
+            key (str): 和风天气API的密钥。
+
+        返回:
+            Any: 请求的结果。返回的类型取决于服务器响应的内容。
+        """
+        location_data = await self.qweather_get_location(city, key)
+        qweather_url = self.__qweather_return_url()
         weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
         hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
 
-        hf_city_location = await fetch_data(weather_url)
+        hf_city_location = await self.__fetch_data(weather_url)
         weather_json = hf_city_location.json()
         forecast_data = weather_json["daily"]
 
-        hf_city_location_base = await fetch_data(hf_weather_url)
+        hf_city_location_base = await self.__fetch_data(hf_weather_url)
         weather_json = hf_city_location_base.json()
         weather_data_base = weather_json["now"]
 
