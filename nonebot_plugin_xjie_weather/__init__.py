@@ -85,12 +85,38 @@ def is_integer_not_float(s: str) -> bool:
 
 
 def has_common_elements(list1: List, list2: List) -> bool:
+    """
+    判断两个列表是否有共同的元素。
+
+    参数:
+        list1 (List): 第一个列表。
+        list2 (List): 第二个列表。
+
+    返回:
+        bool: 如果两个列表有至少一个共同元素，则返回True；否则返回False。
+    """
     set1 = set(list1)
     set2 = set(list2)
     return bool(set1 & set2)
 
 
 def convert_to_int_list(values) -> List:
+    """
+    将输入的可迭代对象中的每个元素转换为整数，并返回一个整数列表。
+
+    参数:
+        values (Iterable): 包含可转换为整数的元素的可迭代对象。
+
+    返回:
+        List[int]: 一个包含整数的列表。如果输入中存在不可转换为整数的元素，
+                    则返回一个空列表。
+
+    示例:
+        >>> convert_to_int_list(['1', '2', '3'])
+        [1, 2, 3]
+        >>> convert_to_int_list(['1', 'a', '3'])
+        []
+    """
     try:
         return [int(value) for value in values]
     except ValueError:
