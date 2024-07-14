@@ -21,7 +21,7 @@ class QWEATHER:
         async with xj_requests() as xj:
             return await xj.xj_requests_main(url)
 
-    def __qweather_return_url() -> str:
+    def __qweather_return_url(self) -> str:
         QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")
         if QWEATHER_APITYPE == 0:
             return 'https://devapi.qweather.com/v7/weather/'
