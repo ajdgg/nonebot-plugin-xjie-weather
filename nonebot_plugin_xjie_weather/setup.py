@@ -41,6 +41,7 @@ def remove_if_exists(user_id):
         elif key in _configuration_option:
             del _configuration_option[key]
 
+    _time_a["t"] = False
     _configuration_option["SG"] = False
     _configuration_option["SF"] = False
 
@@ -68,9 +69,9 @@ async def setup_handle(bot: Bot, event: Event, state: T_State, args: Message = C
         _configuration_option["option"] = "set_administrator"
         await xj_setup.send("无配置管理员是否配置管理员，在配置完成后需要管理员才能额外添加新的管理员y/n")
     elif int(user_id) in XjieVariable._admin_whitelist or user_id in XjieVariable._admin_whitelist:
-        if xj_user_configuration := args .extract_plain_text():
+        if xj_user_configuration := args.extract_plain_text():
             print(xj_user_configuration)
-            await xj_setup.finish("优先天气")
+            await xj_setup.finish("暂不支持")
         else:
             ids = event.get_session_id()
             _configuration_state[user_id] = "enter_configuration_mode"
@@ -89,9 +90,9 @@ async def configuration_responsive(bot: Bot, event: Event):
     user_id = event.get_user_id()
     args = str(event.get_message()).strip()
     if args == "退出":
-        await xj_setup_responsive.send("退出成功")
         remove_if_exists(user_id)
-    if _configuration_option["option"] == "set_administrator":
+        await xj_setup_responsive.finish("退出成功")
+    if _configuration_option.get("option") == "set_administrator":
         async def update_admin_list(user_id, confirm):
             if confirm:
                 XjieVariable._admin_whitelist.append(user_id)
@@ -117,16 +118,16 @@ async def configuration_responsive(bot: Bot, event: Event):
         elif args in xj_no:
             await update_admin_list(user_id, False)
         else:
-            await xj_setup_responsive.finish("请输入y/n")
+            await xj_setup_responsive.send("请输入y/n")
 
-    elif _configuration_option["option"] == "setting_list":
+    elif _configuration_option.get("option") == "setting_list":
 
         if _configuration_option["ground-floor"] and is_integer_not_float(args):
             try:
                 args = dz[int(args)]
                 print(args)
             except IndexError:
-                await xj_setup_responsive.finish("输入错误，请重新输入")
+                await xj_setup_responsive.send("输入错误，请重新输入")
 
         keydata = xj_file_handle.xj_file_reading("xjie_data.json")
         keys_ending_with_KEY = [k for k in keydata.keys() if k.endswith("_KEY")]
@@ -158,14 +159,13 @@ async def configuration_responsive(bot: Bot, event: Event):
 
                         try:
                             a_data = keys_ending_with_KEY[int(args) - 1]
+                            await xj_setup_responsive.send(f"请输入{a_data}的key")
+
+                            _configuration_option["X_KEY"] = a_data
+                            _configuration_option["SF"] = True
                         except IndexError:
                             print(f"索引 {int(args)} 无效，列表长度为 {len(keys_ending_with_KEY)}")
                             await xj_setup_responsive.finish("输入错误，请重新输入")
-
-                        await xj_setup_responsive.send(f"请输入{a_data}的key")
-
-                        _configuration_option["X_KEY"] = a_data
-                        _configuration_option["SF"] = True
                     else:
                         await xj_setup_responsive.send("输入错误")
             else:
@@ -181,12 +181,11 @@ async def configuration_responsive(bot: Bot, event: Event):
                 if is_integer_not_float(args):
                     try:
                         x_data = keys_ending_with_KEY[int(args) - 1]
+                        xj_file_handle.xj_file_change("xjie_data.json", "default_api", x_data)
+                        XjieVariable._get_default_platform["mr"] = x_data
+                        await xj_setup_responsive.send(f"默认天气平台已切换为{x_data}")
                     except IndexError:
-                        await xj_setup_responsive.finish("输入错误，请重新输入")
-
-                    xj_file_handle.xj_file_change("xjie_data.json", "default_api", x_data)
-                    XjieVariable._get_default_platform["mr"] = x_data
-                    await xj_setup_responsive.send(f"默认天气平台已切换为{x_data}")
+                        await xj_setup_responsive.send("输入错误，请重新输入")
 
                     _configuration_option["ground-floor"] = True
                     _configuration_option["SG"] = False
@@ -200,4 +199,4 @@ async def configuration_responsive(bot: Bot, event: Event):
 
                 _configuration_option["SG"] = True
         else:
-            await xj_setup_responsive.finish("输入错误")
+            await xj_setup_responsive.send("输入错误")
