@@ -29,7 +29,8 @@ xj_no = ['否', 'n', 'no', 'N', 'NO', 'No', 'nO', 'N0']
 
 dz = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
-setup_function_list = ['配置key', '设置优先平台']
+setup_function_list = ['配置key', '设置优先平台', '和风天气订阅类型']
+qweather_subscribe = ['免费订阅', '付费订阅']
 
 
 def remove_if_exists(user_id):
@@ -197,6 +198,29 @@ async def configuration_responsive(bot: Bot, event: Event):
             else:
                 await xj_setup_responsive.send(f"请选择要设置的key\n{menu_dispose(keys_ending_with_KEY)}")
 
+                _configuration_option["SG"] = True
+        elif args == 'three' or _configuration_option.get("SL", '') == '3':
+            _configuration_option["ground-floor"] = False
+            _configuration_option["SL"] = "3"
+
+            if _configuration_option["SG"]:
+                if is_integer_not_float(args):
+                    try:
+                        xj_file_handle.xj_file_change("xjie_data.json", "QWEATHER_APITYPE", int(args) - 1)
+                        await xj_setup_responsive.send(f"和风天气订阅已切换为{qweather_subscribe[int(args) - 1]}")
+
+                        _configuration_option["ground-floor"] = True
+                        _configuration_option["SG"] = False
+                        del _configuration_state[user_id]
+                        del _configuration_option["SL"]
+                        del _configuration_option["option"]
+                    except IndexError:
+                        print("IndexError")
+                        await xj_setup_responsive.send("输入错误，请重新输入")
+                else:
+                    await xj_setup_responsive.send("输入错误")
+            else:
+                await xj_setup_responsive.send(f"请选择要设置的key\n{menu_dispose(qweather_subscribe)}")
                 _configuration_option["SG"] = True
         else:
             await xj_setup_responsive.send("输入错误")
