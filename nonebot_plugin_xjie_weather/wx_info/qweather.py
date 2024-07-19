@@ -44,7 +44,7 @@ class QWEATHER:
         location_url = f'{location}?location={city_name}&key={key}'
         gd_city_adcode = await self.__fetch_data(location_url)
         if gd_city_adcode is None:
-            raise ValueError("Failed to send request")
+            return ['error', '网络延迟过高']
         coding_json = gd_city_adcode.json()
         xiangy = coding_json.get('code')
         if xiangy != '200':
