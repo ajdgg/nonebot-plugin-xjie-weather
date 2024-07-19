@@ -1,3 +1,5 @@
+from PIL import Image
+import io
 from pathlib import Path
 from nonebot.adapters import Message
 from nonebot.matcher import Matcher
@@ -43,18 +45,21 @@ async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
 
 @xj_weather.got("xj_user_message", prompt="请输入地名")
 async def got_location(xj_user_message: str = ArgPlainText()):
-    path = Path(__file__).parent / "weatherforecast.png"
+    img = Image.open(Path(__file__).parent / "weatherforecast.png")
+    img_byte_arr = io.BytesIO()
+    img.save(img_byte_arr, format='JPEG')
+    img_byte_arr = img_byte_arr.getvalue()
     if XjieVariable._get_default_platform["mr"] != '':
         bot_result = await get_weather.xj_get_weather_main(xj_user_message, XjieVariable._get_default_platform["mr"])
         if bot_result == '200':
-            await UniMessage.image(path=path).send()
+            await UniMessage.image(raw=img_byte_arr).send()
         elif isinstance(bot_result, list):
             if bot_result[0] == "error":
                 await xj_weather.finish(bot_result[1])
     else:
         bot_result = await get_weather.xj_get_weather_main(xj_user_message)
         if bot_result == '200':
-            await UniMessage.image(path=path).send()
+            await UniMessage.image(raw=img_byte_arr).send()
         elif isinstance(bot_result, list):
             if bot_result[0] == "error":
                 await xj_weather.finish(bot_result[1])

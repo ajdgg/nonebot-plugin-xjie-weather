@@ -29,7 +29,7 @@ def weather_html(data, data_type: str):
 
 async def open_local_html():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=1000)
+        browser = await p.chromium.launch(headless=True, slow_mo=1000)
         page = await browser.new_page()
         html_file_path = Path(__file__).resolve().parent / "src/output.html"
         await page.goto(f"file:///{html_file_path}")
