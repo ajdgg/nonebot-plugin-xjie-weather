@@ -14,9 +14,9 @@ class Config(BaseModel):
 
 
 plugin_config: Config = get_plugin_config(Config)
+X_SUPERUSERS = plugin_config.superusers
 AMAP_KEY = plugin_config.amap_key
 QWEATHER_KEY = plugin_config.qweather_key
-X_SUPERUSERS = plugin_config.superusers
 
 
 class XjieVariable:

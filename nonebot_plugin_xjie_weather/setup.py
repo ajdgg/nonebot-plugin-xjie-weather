@@ -8,7 +8,7 @@ from nonebot.adapters import Message
 from nonebot.matcher import Matcher
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
-from .data_utilities import menu_dispose, is_integer_not_float, convert_to_int_list, has_common_elements, save_superusers
+from .data_utilities import menu_dispose, is_integer_not_float
 from .file_handle import xj_file_handle
 from .config import XjieVariable, X_SUPERUSERS
 

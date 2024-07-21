@@ -8,7 +8,8 @@ from nonebot import on_command, require
 from nonebot.rule import to_me
 from nonebot.params import CommandArg, ArgPlainText
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from .config import XjieVariable
+from .config import XjieVariable, AMAP_KEY, QWEATHER_KEY
+from .file_handle import xj_file_handle
 from .setup import xj_setup
 
 require("nonebot_plugin_alconna")
@@ -23,6 +24,17 @@ __plugin_meta__ = PluginMetadata(
     homepage="https://github.com/ajdgg/nonebot-plugin-xjie-weather",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
+
+xj_file_handle = xj_file_handle()
+
+apikey = {
+    'AMAP_KEY': AMAP_KEY,
+    'QWEATHER_KEY': QWEATHER_KEY,
+}
+key_json_data = xj_file_handle.xj_file_reading("xjie_data.json")
+for key in apikey:
+    if key_json_data[str(key)] == '':
+        xj_file_handle.xj_file_change("xjie_data.json", key, apikey[key])
 
 setup_function_list = ['配置key', '设置优先平台']
 
