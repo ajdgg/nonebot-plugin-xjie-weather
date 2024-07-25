@@ -10,7 +10,7 @@ from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
 from .data_utilities import menu_dispose, is_integer_not_float
 from .file_handle import xj_file_handle
-from .config import XjieVariable, X_SUPERUSERS
+from .config import XjieVariable
 
 
 xj_file_handle = xj_file_handle()
