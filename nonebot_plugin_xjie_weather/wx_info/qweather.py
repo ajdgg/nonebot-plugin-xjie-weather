@@ -1,6 +1,7 @@
 from ..xj_requests import xj_requests
 from ..main import weather_img
 from ..file_handle import xj_file_handle
+from typing import List
 
 
 weather_img = weather_img()
@@ -45,6 +46,7 @@ class QWEATHER:
         gd_city_adcode = await self.__fetch_data(location_url)
         if gd_city_adcode is None:
             return ['error', '网络延迟过高']
+            # raise ValueError("Failed to send request")
         coding_json = gd_city_adcode.json()
         xiangy = coding_json.get('code')
         if xiangy != '200':
@@ -63,20 +65,25 @@ class QWEATHER:
             Any: 请求的结果。返回的类型取决于服务器响应的内容。
         """
         location_data = await self.qweather_get_location(city, key)
+        if isinstance(location_data, List):
+            return location_data
         qweather_url = self.__qweather_return_url()
         weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
         hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
 
         hf_city_location = await self.__fetch_data(weather_url)
-        weather_json = hf_city_location.json()
-        forecast_data = weather_json["daily"]
-
         hf_city_location_base = await self.__fetch_data(hf_weather_url)
-        weather_json = hf_city_location_base.json()
-        weather_data_base = weather_json["now"]
+        if hf_city_location is None or hf_city_location_base is None:
+            return ['error', '网络延迟过高']
+        weather_json_a = hf_city_location.json()
 
-        if weather_json.get('code') != '200' or weather_json.get('code') != '200':
+        weather_json_b = hf_city_location_base.json()
+
+        if weather_json_a.get('code') != '200' or weather_json_b.get('code') != '200':
             return ["error", '获取天气失败']
+
+        forecast_data = weather_json_a["daily"]
+        weather_data_base = weather_json_b["now"]
 
         # bot_sc = '===| ' + city + '天气 |===\n-----[ 今天 ]-----\n' + second_day_info_A['fxDate'] + '\n早：' + second_day_info_A['textDay'] + '\n' + '晚：' + second_day_info_A['textNight'] + '\n' + '温度：' + second_day_info_A['tempMax'] + '~' + second_day_info_A['tempMin'] + '\n-----[ 明天 ]-----\n' + second_day_info_B['fxDate'] + '\n早：' + second_day_info_B['textDay'] + '\n' + '晚：' + second_day_info_B['textNight'] + '\n' + '温度：' + second_day_info_B['tempMax'] + '~' + second_day_info_B['tempMin']
         img_data = await weather_img.get_weather_img(forecast_data, weather_data_base, 'QWEATHER', city)
