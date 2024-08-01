@@ -3,11 +3,19 @@ html, body, div, span, ul, li{
     padding: 0;
 	box-sizing: border-box;
 }
+@font-face {
+	font-family: 'AlimamaShuHeiTi-Bold';
+	src: url('./fonts/AlimamaShuHeiTi-Bold.woff2') format("woff2"),;
+}
+@font-face {
+	font-family: 'iconfont';
+	src: url('./fonts/iconfont.woff2') format('woff2');
+}
 body{
+	font-family: 'AlimamaShuHeiTi-Bold', 'iconfont';
 	background-color: #CCFFFF;
 	display: flex;
 	justify-content: center;
-	
 }
 li{
 	list-style: none;
