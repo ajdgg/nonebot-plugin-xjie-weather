@@ -11,12 +11,14 @@ class Config(BaseModel):
     amap_key: Optional[str] = Field(default=None)
     qweather_key: Optional[str] = Field(default=None)
     superusers: Optional[list] = Field(default=[])
+    qweather_apitype: Optional[int] = Field(default=None)
 
 
 plugin_config: Config = get_plugin_config(Config)
 X_SUPERUSERS = plugin_config.superusers
 AMAP_KEY = plugin_config.amap_key
 QWEATHER_KEY = plugin_config.qweather_key
+QWEATHER_APITYPE = plugin_config.qweather_apitype
 
 
 class XjieVariable:
