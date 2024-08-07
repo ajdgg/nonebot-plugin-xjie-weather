@@ -10,7 +10,7 @@ from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
 from .data_utilities import menu_dispose, is_integer_not_float
 from .file_handle import xj_file_handle
-from .config import XjieVariable
+from .config import XjieVariable, X_SUPERUSERS
 
 
 xj_file_handle = xj_file_handle()
@@ -188,6 +188,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                     except IndexError:
                         await xj_setup_responsive.send("输入错误，请重新输入")
 
+                    _time_a["t"] = False
                     _configuration_option["ground-floor"] = True
                     _configuration_option["SG"] = False
                     del _configuration_state[user_id]
@@ -209,6 +210,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                         xj_file_handle.xj_file_change("xjie_data.json", "QWEATHER_APITYPE", int(args) - 1)
                         await xj_setup_responsive.send(f"和风天气订阅已切换为{qweather_subscribe[int(args) - 1]}")
 
+                        _time_a["t"] = False
                         _configuration_option["ground-floor"] = True
                         _configuration_option["SG"] = False
                         del _configuration_state[user_id]
