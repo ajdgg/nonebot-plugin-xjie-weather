@@ -50,7 +50,7 @@ pip install nonebot-plugin-xjie-weather
 
 # 配置
 ### 一
-- 使用```st```命令交互式设置key
+- 使用```setup```命令交互式设置key
 
 ```
 AMAP_KEY         高德
