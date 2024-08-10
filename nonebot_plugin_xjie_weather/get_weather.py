@@ -1,11 +1,13 @@
 from .file_handle import xj_file_handle
 from .wx_info.amap import AMAP
 from .wx_info.qweather import QWEATHER
+from .wx_info.vvhan import VVHAN
 from .main import weather_img
 weather_img = weather_img()
 # xj_requests = xj_requests()
 AMAP = AMAP()
 QWEATHER = QWEATHER()
+VVHAN = VVHAN()
 xj_file_handle = xj_file_handle()
 
 
@@ -19,6 +21,7 @@ def a_qf():
 select_get_platform_s = {
     "AMAP_KEY": AMAP.amap_get_weather,
     "QWEATHER_KEY": QWEATHER.qweather_get_weather,
+    "VVHAN_KEY": VVHAN.vvhan_weather,
 }
 
 
