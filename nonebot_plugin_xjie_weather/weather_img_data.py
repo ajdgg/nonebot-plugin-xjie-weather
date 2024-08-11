@@ -121,3 +121,18 @@ class weather_iaqamg:
                 item["date"] = item["fxDate"]
                 item["temp_range"] = f'{item["tempMin"]}&#xe75b;~{item["tempMax"]}&#xe75b;'
             return _eventual_data
+        elif api_name == "VVHAN":
+            print(data)
+            _eventual_data["base"] = data["base"]
+            print("1", _eventual_data)
+            _eventual_data["base"]["weather"] = data["base"]["type"]
+            _eventual_data["base"]["obsTime"] = data["base"]["high"]
+            _eventual_data["base"]["weather_img"] = f'<div class="weather-image qi-{icon.get(data["base"].get("type", "未知"), "999")}"></div>'
+            blockdata = f'''
+            <div class="weather-forecast weather-forecast-qweather">
+                {HtmlModule.humidity_html(data["base"].get("humidity", "未知"))}
+                {HtmlModule.WDSP_html(data["base"].get("fengxiang", "未知"), data["base"].get("fengli", "未知"))}
+            </div>
+            '''
+            print("2", _eventual_data)
+            pass
