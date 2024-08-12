@@ -97,7 +97,7 @@ class weather_iaqamg:
                 year, month, day = map(int, amap["date"].split("-"))
                 amap["week"] = infer_weekday(year, month, day)
                 amap["weather_list_image"] = f'<div class="weather-list-image qi-{icon.get(amap["dayweather"], "999")}"></div>'
-                amap["temp_range"] = f'{amap["nighttemp"]}℃~{amap["daytemp"]}℃'
+                amap["temp_range"] = f'{amap["nighttemp"]}&#xe75b;~{amap["daytemp"]}&#xe75b;'
             return _eventual_data
         elif api_name == "QWEATHER":
             _eventual_data["base"] = data["base"]
