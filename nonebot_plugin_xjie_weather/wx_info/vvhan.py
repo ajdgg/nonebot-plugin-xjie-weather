@@ -15,7 +15,6 @@ class VVHAN:
         vvhan_weather_url = "https://api.vvhan.com/api/weather"
         vvhan_weather_realtime_url = f"{vvhan_weather_url}?city={city_name}"
         vvhan_weather_oneweek_url = f"{vvhan_weather_url}?city={city_name}&type=week"
-        print(vvhan_weather_realtime_url, vvhan_weather_oneweek_url)
 
         vvhan_weather_realtime_httpdata = await self.__fetch_data(vvhan_weather_realtime_url)
         vvhan_weather_realtime_httpdata_json = vvhan_weather_realtime_httpdata.json()
@@ -29,6 +28,5 @@ class VVHAN:
         forecast_data = vvhan_weather_oneweek_httpdata_json.get('data')
         vvhan_theresultobtained_base_data = vvhan_weather_realtime_httpdata_json.get('data')
 
-        print(forecast_data, vvhan_theresultobtained_base_data)
-        # img_data = await weather_img.get_weather_img(forecast_data, vvhan_theresultobtained_base_data, "VVHAN", city_name)
-        # return img_data
+        img_data = await weather_img.get_weather_img(forecast_data, vvhan_theresultobtained_base_data, "VVHAN", city_name)
+        return img_data
