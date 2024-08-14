@@ -97,7 +97,7 @@ class weather_iaqamg:
                 year, month, day = map(int, amap["date"].split("-"))
                 amap["week"] = infer_weekday(year, month, day)
                 amap["weather_list_image"] = f'<div class="weather-list-image qi-{icon.get(amap["dayweather"], "999")}"></div>'
-                amap["temp_range"] = f'{amap["nighttemp"]}&#xe75b;~{amap["daytemp"]}&#xe75b;'
+                amap["temp_range"] = f'{amap["nighttemp"]}℃~{amap["daytemp"]}℃'
             return _eventual_data
         elif api_name == "QWEATHER":
             _eventual_data["base"] = data["base"]
@@ -122,17 +122,20 @@ class weather_iaqamg:
                 item["temp_range"] = f'{item["tempMin"]}&#xe75b;~{item["tempMax"]}&#xe75b;'
             return _eventual_data
         elif api_name == "VVHAN":
-            print(data)
             _eventual_data["base"] = data["base"]
-            print("1", _eventual_data)
+            _eventual_data["base"]["obsTime"] = data["base"]["date"]
             _eventual_data["base"]["weather"] = data["base"]["type"]
-            _eventual_data["base"]["obsTime"] = data["base"]["high"]
+            _eventual_data["base"]["temp"] = data["base"]["high"].replace("°C", "")
             _eventual_data["base"]["weather_img"] = f'<div class="weather-image qi-{icon.get(data["base"].get("type", "未知"), "999")}"></div>'
             blockdata = f'''
             <div class="weather-forecast weather-forecast-qweather">
                 {HtmlModule.humidity_html(data["base"].get("humidity", "未知"))}
-                {HtmlModule.WDSP_html(data["base"].get("fengxiang", "未知"), data["base"].get("fengli", "未知"))}
+                {HtmlModule.WDSP_html(data["base"].get("fengxiang", "未知"), data["base"].get("fengli", "未知"), [False])}
             </div>
             '''
-            print("2", _eventual_data)
-            pass
+            _eventual_data["base"]["blockdata"] = blockdata.replace("\n", "")
+            _eventual_data["all"] = data["all"]
+            for item in _eventual_data["all"]:
+                item["weather_list_image"] = f'<div class="weather-list-image qi-{icon.get(item["type"], "999")}"></div>'
+                item["temp_range"] = f'{item["low"].replace("°C", "")}&#xe75b;~{item["high"].replace("°C", "")}&#xe75b;'
+            return _eventual_data

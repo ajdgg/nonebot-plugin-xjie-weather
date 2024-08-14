@@ -1,4 +1,7 @@
 import jinja2
+import asyncio
+import time
+import os
 from pathlib import Path
 from .weather_img_data import weather_iaqamg
 from playwright.async_api import async_playwright
@@ -33,7 +36,8 @@ async def open_local_html():
         page = await browser.new_page()
         html_file_path = Path(__file__).resolve().parent / "src/output.html"
         await page.goto(f"file:///{html_file_path}")
-        await page.locator("#main").screenshot(path=Path(__file__).resolve().parent / "weatherforecast.png")
+        screenshot_path = Path(__file__).resolve().parent / "weatherforecast.png"
+        await page.locator("#main").screenshot(path=screenshot_path)
         print(await page.title())
         await browser.close()
 
@@ -46,23 +50,12 @@ class weather_img:
         pass
 
     async def get_weather_img(self, data_all, data_base, api_name, city):
-        if api_name == "AMAP":
-            _data_obj["base"] = data_base
-            _data_obj["all"] = data_all
-            data_ha = weather_iaqamg.get_weather_getimg_data(_data_obj, "AMAP")
-            hasd = weather_html(data_ha, city)
-            if hasd == "200":
-                await open_local_html()
-                return "200"
-            else:
-                return ["error", "生成html失败"]
-        elif api_name == "QWEATHER":
-            _data_obj["base"] = data_base
-            _data_obj["all"] = data_all
-            data_ha = weather_iaqamg.get_weather_getimg_data(_data_obj, "QWEATHER")
-            hasd = weather_html(data_ha, city)
-            if hasd == "200":
-                await open_local_html()
-                return "200"
-            else:
-                return ["error", "生成html失败"]
+        _data_obj["base"] = data_base
+        _data_obj["all"] = data_all
+        data_ha = weather_iaqamg.get_weather_getimg_data(_data_obj, api_name)
+        hasd = weather_html(data_ha, city)
+        if hasd == "200":
+            await open_local_html()
+            return "200"
+        else:
+            return ["error", "生成html失败"]
