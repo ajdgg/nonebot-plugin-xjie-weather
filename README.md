@@ -58,6 +58,7 @@ pip install nonebot-plugin-xjie-weather
 ```
 AMAP_KEY         高德
 QWEATHER_KEY     和风天气
+VVHAN_KEY        韩小韩WebAPI接口（天气）
 ```
 如果有多个key想使用哪个或者在一个平台的调用次数用完后可以进行切换
 ```
