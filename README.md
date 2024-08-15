@@ -46,6 +46,7 @@ pip install nonebot-plugin-xjie-weather
 | 和风天气         | 支持✅   |  1000次/天 | 和前面次数共用
 | Visual Crossing | 未完成❌   |
 | 心知天气         | 未完成❌  |
+| 韩小韩WebAPI接口（天气）| 支持✅  | 免费 | 无需 | 
 
 # BUG反馈
 请提```issues```或邮箱```1095530449@qq.com```
