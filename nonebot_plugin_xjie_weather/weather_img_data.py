@@ -1,6 +1,8 @@
 import copy
 from datetime import datetime
+from .html_module import HtmlModule
 
+HtmlModule = HtmlModule()
 
 icon = {
     "晴": "100",
@@ -85,14 +87,8 @@ class weather_iaqamg:
             _eventual_data["base"]["weather_img"] = f'<div class="weather-image qi-{icon.get(data["base"].get("weather", "未知"), "999")}"></div>'
             blockdata = f'''
             <div class="weather-forecast weather-forecast-amap">
-            <div class="weather-chunk">
-                <div class="w-image qi-low-humidity2"></div>
-                <div class="humidness-data">{data["base"]["humidity"]}%</div>
-            </div>
-            <div class="weather-chunk">
-                <div class="w-image qi-wind-chill-advisory"></div>
-                <div class="wind-data">{data["base"]["winddirection"]}风<span>{data["base"]["windpower"]}级</span></div>
-            </div>
+                {HtmlModule.humidity_html(data["base"]["humidity"])}
+                {HtmlModule.WDSP_html(data["base"]["winddirection"], data["base"]["windpower"])}
             </div>
             '''
             _eventual_data["base"]["blockdata"] = blockdata.replace("\n", "")
@@ -109,27 +105,12 @@ class weather_iaqamg:
             _eventual_data["base"]["weather_img"] = f'<div class="weather-image qi-{icon.get(data["base"].get("text", "未知"), "999")}"></div>'
             blockdata = f'''
             <div class="weather-forecast weather-forecast-qweather">
-                <div class="weather-chunk">
-                    <div class="w-image qi-low-humidity2"></div>
-                    <div class="humidness-data">{data["base"].get("humidity", "未知")}%</div>
-                </div>
-                <div class="weather-chunk">
-                    <div class="w-image qi-wind-chill-advisory"></div>
-                    <div class="wind-data">{data["base"].get("windDir", "未知")}<span>{data["base"].get("windScale", "未知")}级</span></div>
-                </div>
-                <div class="weather-chunk">
-                    <div class="w-image qi-high-temperature3"></div>
-                    <div class="humidness-data">体感：{data["base"].get("feelsLike", "未知")}℃</div>
-                </div>
-                <div class="weather-chunk">
-                    <div class="w-image xj-pressure"></div>
-                    <div class="humidness-data">气压：{data["base"].get("pressure", "未知")}hPa</div>
-                </div>
-                <div class="weather-chunk">
-                    <div class="w-image xj-visibility"></div>
-                    <div class="humidness-data">能见度：{data["base"].get("vis", "未知")}/km</div>
-                </div>
-                </div>
+                {HtmlModule.humidity_html(data["base"].get("humidity", "未知"))}
+                {HtmlModule.WDSP_html(data["base"].get("windDir", "未知"), data["base"].get("windScale", "未知"))}
+                {HtmlModule.body_surface_temperature_html(data["base"].get("feelsLike", "未知"))}
+                {HtmlModule.air_pressure_html(data["base"].get("pressure", "未知"))}
+                {HtmlModule.visibility_html(data["base"].get("vis", "未知"))}
+            </div>
             '''
             _eventual_data["base"]["blockdata"] = blockdata.replace("\n", "")
             _eventual_data["all"] = data["all"]
@@ -138,5 +119,23 @@ class weather_iaqamg:
                 item["week"] = infer_weekday(year, month, day)
                 item["weather_list_image"] = f'<div class="weather-list-image qi-{icon.get(item["textDay"], "999")}"></div>'
                 item["date"] = item["fxDate"]
-                item["temp_range"] = f'{item["tempMin"]}℃~{item["tempMax"]}℃'
+                item["temp_range"] = f'{item["tempMin"]}&#xe75b;~{item["tempMax"]}&#xe75b;'
+            return _eventual_data
+        elif api_name == "VVHAN":
+            _eventual_data["base"] = data["base"]
+            _eventual_data["base"]["obsTime"] = data["base"]["date"]
+            _eventual_data["base"]["weather"] = data["base"]["type"]
+            _eventual_data["base"]["temp"] = data["base"]["high"].replace("°C", "")
+            _eventual_data["base"]["weather_img"] = f'<div class="weather-image qi-{icon.get(data["base"].get("type", "未知"), "999")}"></div>'
+            blockdata = f'''
+            <div class="weather-forecast weather-forecast-qweather">
+                {HtmlModule.humidity_html(data["base"].get("humidity", "未知"))}
+                {HtmlModule.WDSP_html(data["base"].get("fengxiang", "未知"), data["base"].get("fengli", "未知"), [False])}
+            </div>
+            '''
+            _eventual_data["base"]["blockdata"] = blockdata.replace("\n", "")
+            _eventual_data["all"] = data["all"]
+            for item in _eventual_data["all"]:
+                item["weather_list_image"] = f'<div class="weather-list-image qi-{icon.get(item["type"], "999")}"></div>'
+                item["temp_range"] = f'{item["low"].replace("°C", "")}&#xe75b;~{item["high"].replace("°C", "")}&#xe75b;'
             return _eventual_data

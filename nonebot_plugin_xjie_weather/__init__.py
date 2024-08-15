@@ -1,6 +1,7 @@
 from PIL import Image
 import io
 from pathlib import Path
+from nonebot.log import logger
 from nonebot.adapters import Message
 from nonebot.matcher import Matcher
 from .get_weather import get_weather
@@ -8,7 +9,7 @@ from nonebot import on_command, require
 from nonebot.rule import to_me
 from nonebot.params import CommandArg, ArgPlainText
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from .config import XjieVariable, AMAP_KEY, QWEATHER_KEY
+from .config import XjieVariable, AMAP_KEY, QWEATHER_KEY, QWEATHER_APITYPE
 from .file_handle import xj_file_handle
 from .setup import xj_setup
 
@@ -29,12 +30,17 @@ xj_file_handle = xj_file_handle()
 
 apikey = {
     'AMAP_KEY': AMAP_KEY,
-    'QWEATHER_KEY': QWEATHER_KEY,
+    'QWEATHER_KEY': QWEATHER_KEY
 }
 key_json_data = xj_file_handle.xj_file_reading("xjie_data.json")
 for key in apikey:
     if key_json_data[str(key)] == '':
         xj_file_handle.xj_file_change("xjie_data.json", key, apikey[key])
+
+if QWEATHER_APITYPE in [0, 1]:
+    xj_file_handle.xj_file_change("xjie_data.json", 'QWEATHER_APITYPE', QWEATHER_APITYPE)
+else:
+    logger.warning("\033[31m请检查配置文件.env中的QWEATHER_APITYPE是否正确\033[0m")
 
 setup_function_list = ['配置key', '设置优先平台']
 
