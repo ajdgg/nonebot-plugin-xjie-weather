@@ -1,6 +1,7 @@
 {
     "AMAP_KEY": "",
     "QWEATHER_KEY": "",
+    "VVHAN_KEY": "No-keys-required",
     "QWEATHER_APITYPE": 0,
     "default_api": "",
     "admin_whitelist": ""
