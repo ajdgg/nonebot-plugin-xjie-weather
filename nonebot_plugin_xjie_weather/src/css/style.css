@@ -111,6 +111,11 @@ li{
 	height: 50px;
 	background: no-repeat center/100% url('../image/humidity.svg');
 }
+.PM2-5-2-Outlined {
+	width: 50px;
+	height: 50px;
+	background: no-repeat center/100% url('../image/PM2.5-2-Outlined.svg');
+}
 .weather-time{
 	text-align: right;
 	color: #eee;
