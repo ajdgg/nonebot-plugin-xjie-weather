@@ -43,6 +43,7 @@ def remove_if_exists(user_id):
             del _configuration_option[key]
 
     _time_a["t"] = False
+    _configuration_option["ground-floor"] = True
     _configuration_option["SG"] = False
     _configuration_option["SF"] = False
 
@@ -126,7 +127,6 @@ async def configuration_responsive(bot: Bot, event: Event):
         if _configuration_option["ground-floor"] and is_integer_not_float(args):
             try:
                 args = dz[int(args)]
-                print(args)
             except IndexError:
                 await xj_setup_responsive.send("输入错误，请重新输入")
 
@@ -225,4 +225,4 @@ async def configuration_responsive(bot: Bot, event: Event):
                 await xj_setup_responsive.send(f"请选择要设置的key\n{menu_dispose(qweather_subscribe)}")
                 _configuration_option["SG"] = True
         else:
-            await xj_setup_responsive.send("输入错误")
+            await xj_setup_responsive.send("输入1错误")
