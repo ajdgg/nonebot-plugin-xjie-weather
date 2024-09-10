@@ -225,4 +225,4 @@ async def configuration_responsive(bot: Bot, event: Event):
                 await xj_setup_responsive.send(f"请选择要设置的key\n{menu_dispose(qweather_subscribe)}")
                 _configuration_option["SG"] = True
         else:
-            await xj_setup_responsive.send("输入1错误")
+            await xj_setup_responsive.send("输入错误")
