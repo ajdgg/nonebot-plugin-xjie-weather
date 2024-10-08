@@ -1,3 +1,8 @@
+'''
+coding: UTF-8
+Author: AwAjie
+Date: 2024-07-09 19:31:08
+'''
 from PIL import Image
 import io
 from pathlib import Path
@@ -40,7 +45,7 @@ for key in apikey:
 if QWEATHER_APITYPE in [0, 1]:
     xj_file_handle.xj_file_change("xjie_data.json", 'QWEATHER_APITYPE', QWEATHER_APITYPE)
 else:
-    logger.warning("\033[31m请检查配置文件.env中的QWEATHER_APITYPE是否正确\033[0m")
+    logger.warning("如果您有在.env配置和风天气的QWEATHER_APITYPE因而触发此提示，请检查配置文件.env中的QWEATHER_APITYPE是否正确，当然您也可以无视此提示，这将使用默认值，您可以使用插件内设置功能进行设置。")
 
 setup_function_list = ['配置key', '设置优先平台']
 
