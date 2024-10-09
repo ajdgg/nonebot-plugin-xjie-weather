@@ -68,7 +68,19 @@ default_api     优先使用的平台
 ```
 ![st](./static/pz-bot-key.png)
 
+### 二
+- 在.env文件中配置
+```
+高德密钥  
+AMAP_KEY = ""
 
+和风天气密钥
+QWEATHER_KEY = ""
+
+和风天气订阅配置免费为0（默认）付费为1
+QWEATHER_APITYPE = 0
+```
+  在.env文件配置的信息覆盖权限小于交互式设置的key，也就是说当您在使用```setup```设置过密钥后，会使用您在```setup```设置的密钥而不使用您.env中配置的密钥。
 # 平台key获取
  [📦 高德](/amap.md)
 
