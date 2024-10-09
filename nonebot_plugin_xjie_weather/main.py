@@ -1,7 +1,9 @@
+'''
+coding: UTF-8
+Author: AwAjie
+Date: 2024-07-09 19:31:08
+'''
 import jinja2
-import asyncio
-import time
-import os
 from pathlib import Path
 from .weather_img_data import weather_iaqamg
 from playwright.async_api import async_playwright
@@ -30,16 +32,17 @@ def weather_html(data, data_type: str):
     return "200"
 
 
+# 新 new
 async def open_local_html():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, slow_mo=1000)
         page = await browser.new_page()
         html_file_path = Path(__file__).resolve().parent / "src/output.html"
         await page.goto(f"file:///{html_file_path}")
-        screenshot_path = Path(__file__).resolve().parent / "weatherforecast.png"
-        await page.locator("#main").screenshot(path=screenshot_path)
+        screenshot_image = await page.locator("#main").screenshot(type='png')
         print(await page.title())
         await browser.close()
+        return screenshot_image
 
 
 _data_obj = {}
@@ -55,7 +58,7 @@ class weather_img:
         data_ha = weather_iaqamg.get_weather_getimg_data(_data_obj, api_name)
         hasd = weather_html(data_ha, city)
         if hasd == "200":
-            await open_local_html()
-            return "200"
+            typeimg = await open_local_html()
+            return ["200", typeimg]
         else:
             return ["error", "生成html失败"]

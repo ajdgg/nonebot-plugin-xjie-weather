@@ -1,7 +1,7 @@
 '''
 coding: UTF-8
 Author: AwAjie
-Date: 2024-07-09 19:31:08
+Date: 2024-07-05 16:26:29
 '''
 from PIL import Image
 import io
@@ -45,7 +45,8 @@ for key in apikey:
 if QWEATHER_APITYPE in [0, 1]:
     xj_file_handle.xj_file_change("xjie_data.json", 'QWEATHER_APITYPE', QWEATHER_APITYPE)
 else:
-    logger.warning("如果您有在.env配置和风天气的QWEATHER_APITYPE因而触发此提示，请检查配置文件.env中的QWEATHER_APITYPE是否正确，当然您也可以无视此提示，这将使用默认值，您可以使用插件内设置功能进行设置。")
+            logger.warning("如果您有在.env配置和风天气的QWEATHER_APITYPE因而触发此提示，请检查配置文件.env中的QWEATHER_APITYPE是否正确，当然您也可以无视此提示，这将使用默认值，您可以使用插件内设置功能进行设置。")
+
 
 setup_function_list = ['配置key', '设置优先平台']
 
@@ -78,15 +79,15 @@ async def got_location(xj_user_message: str = ArgPlainText()):
 
     if XjieVariable._get_default_platform["mr"] != '':
         bot_result = await get_weather.xj_get_weather_main(xj_user_message, XjieVariable._get_default_platform["mr"])
-        if bot_result == '200':
-            await UniMessage.image(raw=img_byte_arr()).send()
+        if bot_result[0] == '200':
+            await UniMessage.image(raw=bot_result[1]).send()
         elif isinstance(bot_result, list):
             if bot_result[0] == "error":
                 await xj_weather.finish(bot_result[1])
     else:
         bot_result = await get_weather.xj_get_weather_main(xj_user_message)
         if bot_result == '200':
-            await UniMessage.image(raw=img_byte_arr()).send()
+            await UniMessage.image(raw=bot_result[1]).send()
         elif isinstance(bot_result, list):
             if bot_result[0] == "error":
                 await xj_weather.finish(bot_result[1])
