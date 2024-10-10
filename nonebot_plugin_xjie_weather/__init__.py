@@ -22,6 +22,9 @@ require("nonebot_plugin_alconna")
 
 from nonebot_plugin_alconna import UniMessage
 
+from .xjie_db import DatabaseManager
+dblg = DatabaseManager()
+
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-xjie-weather",
     description="一个小小的天气插件",
@@ -42,10 +45,11 @@ for key in apikey:
     if key_json_data[str(key)] == '':
         xj_file_handle.xj_file_change("xjie_data.json", key, apikey[key])
 
-if QWEATHER_APITYPE in [0, 1]:
-    xj_file_handle.xj_file_change("xjie_data.json", 'QWEATHER_APITYPE', QWEATHER_APITYPE)
-else:
-            logger.warning("如果您有在.env配置和风天气的QWEATHER_APITYPE因而触发此提示，请检查配置文件.env中的QWEATHER_APITYPE是否正确，当然您也可以无视此提示，这将使用默认值，您可以使用插件内设置功能进行设置。")
+if QWEATHER_APITYPE is not None:
+    if QWEATHER_APITYPE in [0, 1]:
+        xj_file_handle.xj_file_change("xjie_data.json", 'QWEATHER_APITYPE', QWEATHER_APITYPE)
+    else:
+        logger.warning("如果您有在.env配置和风天气的QWEATHER_APITYPE因而触发此提示，请检查配置文件.env中的QWEATHER_APITYPE是否正确，当然您也可以无视此提示，这将使用默认值，您可以使用插件内设置功能进行设置。")
 
 
 setup_function_list = ['配置key', '设置优先平台']
