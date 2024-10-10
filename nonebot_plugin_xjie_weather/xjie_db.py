@@ -8,20 +8,30 @@ from pathlib import Path
 
 
 # 连接SQLite数据库
+
 class DatabaseManager:
-    def __init__(self):
-        db_path = Path(__file__).resolve().parent / 'src/db/region.db'
-        self.conn = sqlite3.connect(db_path)
+    def __init__(self, db_path=None):
+        if db_path is None:
+            db_path = Path(__file__).resolve().parent / 'db/region.db'
+        self.conn = sqlite3.connect(db_path, timeout=10)  # 设置连接超时
         self.cursor = self.conn.cursor()
 
     def city_lnglat(self, value: str, key="name"):
-        self.cursor.execute(f'SELECT lng, lat FROM region WHERE {key} LIKE ?', (f'{value}%',))
-        row = self.cursor.fetchone()
-        if row:
+        try:
+            query = f'SELECT {key}, lng, lat FROM region WHERE {key} LIKE ?'
+            self.cursor.execute(query, (value + '%',))
+            row = self.cursor.fetchall()
             return row
-        else:
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
             return None
 
     def close(self):
         self.cursor.close()
         self.conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
