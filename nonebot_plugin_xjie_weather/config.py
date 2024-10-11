@@ -1,3 +1,8 @@
+'''
+coding: UTF-8
+Author: AwAjie
+Date: 2024-07-09 22:02:01
+'''
 from pydantic import BaseModel, Field
 from typing import Optional
 from nonebot import get_plugin_config
@@ -37,4 +42,7 @@ class XjieVariable:
     _get_default_platform["xjie_data"] = xj_data
 
     default_api = xj_file_handle.xj_file_reading("xjie_data.json", "default_api")
-    _get_default_platform["mr"] = default_api
+    default_api_key = xj_file_handle.xj_file_reading("xjie_data.json", default_api)
+    _get_default_platform["mr"] = [default_api, default_api_key]
+
+    _Local_in_latitude_and_longitude = xj_file_handle.xj_file_reading("xjie_data.json", "Local_in_latitude_and_longitude")
