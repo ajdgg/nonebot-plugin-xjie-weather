@@ -48,10 +48,6 @@ class AMAP:
         xiangy = coding_json.get('status')
         if xiangy == 0:
             return ["error", coding_json["info"]]
-        # adcode = coding_json["geocodes"][0]["adcode"]-+        # if adcode is None:
-        #     return ["error", "错误"]
-        # return adcode
-        print(len(coding_json.get('geocodes', "")))
         if len(coding_json.get('geocodes', "")) > 1:
             return ["multi_area_app", "AMAP_KEY", key, coding_json["geocodes"]]
         return ["ok", coding_json["geocodes"][0]["adcode"]]

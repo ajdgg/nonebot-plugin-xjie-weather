@@ -184,26 +184,10 @@ async def special_position_temporary_storage_handle_fun(event: Event):
     args = event.get_message().extract_plain_text()
 
     if args == "退出" or args == "t":
-        await special_position_temporary_storage_handle.send("已退出")
         del _special_position_temporary_storage[user_id]
+        await special_position_temporary_storage_handle.finish("已退出")
 
-    # print(_special_position_temporary_storage[user_id][1][int(args) - 1])
     if _special_position_temporary_storage[user_id][1] == "AMAP_KEY":
-        # print(
-        #     [
-        #         _special_position_temporary_storage[user_id][1],
-        #         _special_position_temporary_storage[user_id][2],
-        #         _special_position_temporary_storage[user_id][3][int(args) - 1].get(
-        #             "formatted_address", None
-        #         ),
-        #         None,
-        #         None,
-        #         None,
-        #         _special_position_temporary_storage[user_id][3][int(args) - 1].get(
-        #             "adcode", None
-        #         ),
-        #     ]
-        # )
         bot_result = await get_weather.xj_get_weather_p(
             [
                 _special_position_temporary_storage[user_id][1],
@@ -220,7 +204,6 @@ async def special_position_temporary_storage_handle_fun(event: Event):
             ]
         )
 
-    # await special_position_temporary_storage_handle.send(_special_position_temporary_storage[user_id][1][int(args) - 1])
     if bot_result[0] == "200":
         await UniMessage.image(raw=bot_result[1]).send()
     del _special_position_temporary_storage[user_id]
