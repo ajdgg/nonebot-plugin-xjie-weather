@@ -6,16 +6,18 @@ Date: 2024-07-05 16:26:29
 from PIL import Image
 import io
 from pathlib import Path
+from typing import List
 from nonebot.log import logger
-from nonebot.adapters import Message
+from nonebot.adapters import Message, Bot, Event
 from nonebot.matcher import Matcher
 from .get_weather import get_weather
-from nonebot import on_command, require
+from nonebot import on_command, require, on_message
 from nonebot.rule import to_me
 from nonebot.params import CommandArg, ArgPlainText
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from .config import XjieVariable, AMAP_KEY, QWEATHER_KEY, QWEATHER_APITYPE
 from .file_handle import xj_file_handle
+from .data_utilities import l_list, menu_dispose
 from .setup import xj_setup
 
 require("nonebot_plugin_alconna")
@@ -56,14 +58,32 @@ setup_function_list = ['配置key', '设置优先平台']
 
 get_weather = get_weather()
 
+_special_position_temporary_storage = {}
+
 xj_weather = on_command("天气", rule=to_me(), priority=10, block=True)
 
 
-def img_byte_arr():
-    img = Image.open(Path(__file__).parent / "weatherforecast.png")
-    img_byte_arr = io.BytesIO()
-    img.save(img_byte_arr, format='JPEG')
-    return img_byte_arr.getvalue()
+def get_the_default_platform():
+    """
+    获取默认平台
+    Get the default platform
+
+    返回:
+        list: [default_platform, default_api]
+    """
+    key_data = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
+    a = list(key_data.items())
+    first_key, first_value = a[0]
+    return [first_key, first_value]
+
+
+def split_string_by_hash(input_string: str):
+    if '#' in input_string:
+        parts = input_string.split('#')
+        parts = [part for part in parts if part]
+        return parts
+    else:
+        return input_string
 
 
 @xj_weather.handle()
@@ -79,19 +99,136 @@ async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
 
 
 @xj_weather.got("xj_user_message", prompt="请输入地名")
-async def got_location(xj_user_message: str = ArgPlainText()):
+async def got_location(event: Event, xj_user_message: str = ArgPlainText()):
+    #
+    # get_weather.xj_get_weather_main返回 [状态类型， 数据内容]
+    # 进入重复选择的信息类型 ["Selective_area", 平台名称, 平台key, 重复的数据数组]
+    # #
 
-    if XjieVariable._get_default_platform["mr"] != '':
-        bot_result = await get_weather.xj_get_weather_main(xj_user_message, XjieVariable._get_default_platform["mr"])
+    user_id = event.get_user_id()
+
+    #
+    # 有设置默认api
+    # #
+    if XjieVariable._get_default_platform["mr"][0] != '':
+        bot_result = await get_weather.xj_get_weather_main(
+            split_string_by_hash(xj_user_message),
+            [
+                XjieVariable._get_default_platform["mr"][0],
+                XjieVariable._get_default_platform["mr"][1],
+            ],
+        )
         if bot_result[0] == '200':
             await UniMessage.image(raw=bot_result[1]).send()
-        elif isinstance(bot_result, list):
-            if bot_result[0] == "error":
-                await xj_weather.finish(bot_result[1])
+        elif bot_result[0] == "error":
+            await xj_weather.finish(bot_result[1])
+        elif bot_result[0] == "multi_area":
+            _special_position_temporary_storage[user_id] = [
+                "Selective_area",
+                bot_result[1],
+                XjieVariable._get_default_platform["mr"][1],
+                bot_result[2]
+            ]
+            await xj_weather.send(menu_dispose(l_list(bot_result[1])))
+        elif bot_result[0] == "multi_area_app":
+            if bot_result[1] == "AMAP_KEY":
+                _special_position_temporary_storage[user_id] = [
+                    "Selective_area",
+                    bot_result[1],
+                    XjieVariable._get_default_platform["mr"][1],
+                    [
+                        {"formatted_address": item["formatted_address"], "adcode": item["adcode"]}
+                        for item in bot_result[3]
+                    ],
+                ]
+                await xj_weather.send(menu_dispose([item["formatted_address"] for item in bot_result[3]]))
+
+    #
+    # 无默认api
+    # #
     else:
-        bot_result = await get_weather.xj_get_weather_main(xj_user_message)
-        if bot_result == '200':
+        bot_result = await get_weather.xj_get_weather_main(split_string_by_hash(xj_user_message), get_the_default_platform())
+        if bot_result[0] == '200':
             await UniMessage.image(raw=bot_result[1]).send()
-        elif isinstance(bot_result, list):
-            if bot_result[0] == "error":
-                await xj_weather.finish(bot_result[1])
+        elif bot_result[0] == "error":
+            await xj_weather.finish(bot_result[1])
+        elif bot_result[0] == "multi_area":
+            _special_position_temporary_storage[user_id] = [
+                "Selective_area",
+                bot_result[1],
+                XjieVariable._get_default_platform["mr"][1],
+                bot_result[2]
+            ]
+            await xj_weather.send(menu_dispose(l_list(bot_result[1])))
+        elif bot_result[0] == "multi_area_app":
+            if bot_result[1] == "AMAP_KEY":
+                print("asdddd")
+                _special_position_temporary_storage[user_id] = [
+                    "Selective_area",
+                    bot_result[1],
+                    XjieVariable._get_default_platform["mr"][1],
+                    [
+                        {"formatted_address": item["formatted_address"], "adcode": item["adcode"]}
+                        for item in bot_result[3]
+                    ],
+                ]
+                await xj_weather.send(menu_dispose([item["formatted_address"] for item in bot_result[3]]))
+
+
+special_position_temporary_storage_handle = on_message(rule=lambda event: isinstance(event, Event) and _special_position_temporary_storage.get(event.get_user_id(), [None])[0] == "Selective_area", priority=5)
+
+
+@special_position_temporary_storage_handle.handle()
+async def special_position_temporary_storage_handle_fun(event: Event):
+    user_id = event.get_user_id()
+    args = event.get_message().extract_plain_text()
+
+    if args == "退出" or args == "t":
+        await special_position_temporary_storage_handle.send("已退出")
+        del _special_position_temporary_storage[user_id]
+
+    # print(_special_position_temporary_storage[user_id][1][int(args) - 1])
+    if _special_position_temporary_storage[user_id][1] == "AMAP_KEY":
+        # print(
+        #     [
+        #         _special_position_temporary_storage[user_id][1],
+        #         _special_position_temporary_storage[user_id][2],
+        #         _special_position_temporary_storage[user_id][3][int(args) - 1].get(
+        #             "formatted_address", None
+        #         ),
+        #         None,
+        #         None,
+        #         None,
+        #         _special_position_temporary_storage[user_id][3][int(args) - 1].get(
+        #             "adcode", None
+        #         ),
+        #     ]
+        # )
+        bot_result = await get_weather.xj_get_weather_p(
+            [
+                _special_position_temporary_storage[user_id][1],
+                _special_position_temporary_storage[user_id][2],
+                _special_position_temporary_storage[user_id][3][int(args) - 1].get(
+                    "formatted_address", None
+                ),
+                None,
+                None,
+                None,
+                _special_position_temporary_storage[user_id][3][int(args) - 1].get(
+                    "adcode", None
+                ),
+            ]
+        )
+
+    # await special_position_temporary_storage_handle.send(_special_position_temporary_storage[user_id][1][int(args) - 1])
+    if bot_result[0] == "200":
+        await UniMessage.image(raw=bot_result[1]).send()
+    del _special_position_temporary_storage[user_id]
+
+
+lg = on_command("lg", rule=to_me(), priority=10, block=True)
+
+
+@lg.handle()
+async def lg_handle_first_receive(args: Message = CommandArg()):
+    await lg.finish(str(dblg.city_lnglat(args.extract_plain_text())))

@@ -1,3 +1,8 @@
+'''
+coding: UTF-8
+Author: AwAjie
+Date: 2024-07-09 13:05:47
+'''
 from ..xj_requests import xj_requests
 from ..main import weather_img
 from typing import List
@@ -33,37 +38,53 @@ class AMAP:
             Any: 请求的结果。返回的类型取决于服务器响应的内容。
         """
         placen_url = 'https://restapi.amap.com/v3/geocode/geo'
-        get_place_url = f'{placen_url}?key={key}&city={city_name}&address={city_name}&output=JSON'
+
+        get_place_url = f'{placen_url}?key={key}&address={city_name}&output=JSON'
         gd_city_adcode = await self.__fetch_data(get_place_url)
         if gd_city_adcode is None:
-            # print(ValueError("Failed to send request"))
+            print(ValueError("Failed to send request"))
             return ["error", "获取城市编码失败"]
         coding_json = gd_city_adcode.json()
         xiangy = coding_json.get('status')
         if xiangy == 0:
             return ["error", coding_json["info"]]
-        adcode = coding_json["geocodes"][0]["adcode"]
-        if adcode is None:
-            return ["error", "错误"]
-        return adcode
+        # adcode = coding_json["geocodes"][0]["adcode"]-+        # if adcode is None:
+        #     return ["error", "错误"]
+        # return adcode
+        print(len(coding_json.get('geocodes', "")))
+        if len(coding_json.get('geocodes', "")) > 1:
+            return ["multi_area_app", "AMAP_KEY", key, coding_json["geocodes"]]
+        return ["ok", coding_json["geocodes"][0]["adcode"]]
 
-    async def amap_get_weather(self, city_name: str, key: str):
+    async def amap_get_weather(self, city_name: str, key: str, province=None, complete: bool = True):
         """
         async获取高德地图城市天气
 
         参数:
             city_name (str): 城市名字
             key (str): 高德地图API的密钥。
+            province：多地区确认后的参数数组
+            complete: 是否是第2次进入
 
         返回:
             Any: 请求的结果。返回的类型取决于服务器响应的内容。
         """
-        city_adcode = await self.amap_get_adcode(city_name, key)
-        if isinstance(city_adcode, list):
-            return city_adcode
+        if isinstance(city_name, List):
+            print(city_name, "lim")
+            city_name = city_name[0] + city_name[1]
+
+        city_adcode = None
+        if complete:
+            city_adcode = await self.amap_get_adcode(city_name, key)
+            if city_adcode[0] == "multi_area_app":
+                return city_adcode
+            city_adcode = city_adcode[1]
+
         weathe_url = 'https://restapi.amap.com/v3/weather/weatherInfo'
-        weather_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=all'
-        gd_wather_base_url = f'{weathe_url}?key={key}&city={city_adcode}&output=JSON&extensions=base'
+
+        city_data = city_adcode if city_adcode is not None else province[6]
+        weather_url = f'{weathe_url}?key={key}&city={city_data}&output=JSON&extensions=all'
+        gd_wather_base_url = f'{weathe_url}?key={key}&city={city_data}&output=JSON&extensions=base'
 
         weather_data = await self.__fetch_data(weather_url)
         weather_json = weather_data.json()
@@ -76,6 +97,5 @@ class AMAP:
         gd_theresultobtained_base_data = gd_theresultobtained_base['lives'][0]
         forecast_data = weather_json["forecasts"][0]["casts"]
 
-        # bot_sc = '===| ' + city_name + '天气 |===\n-----[ 今天 ]-----\n' + second_day_info_A['date'] + '\n星期' + second_day_info_A['week'] + '\n早：' + second_day_info_A['dayweather'] + '\n' + '晚：' + second_day_info_A['dayweather'] + '\n' + '温度：' + second_day_info_A['nighttemp'] + '~' + second_day_info_A['daytemp'] + '\n-----[ 明天 ]-----\n' + second_day_info_B['date'] + '\n星期' + second_day_info_B['week'] + '\n早：' + second_day_info_B['dayweather'] + '\n' + '晚：' + second_day_info_B['dayweather'] + '\n' + '温度：' + second_day_info_B['nighttemp'] + '~' + second_day_info_B['daytemp']
         img_data = await weather_img.get_weather_img(forecast_data, gd_theresultobtained_base_data, "AMAP", city_name)
         return img_data
