@@ -31,6 +31,10 @@ Latitude_and_longitude_platform = [
     'QWEATHER_KEY',
 ]
 
+only_localdata = [
+    "VISUALCROSSING_KEY",
+]
+
 select_get_platform_s = {
     "AMAP_KEY": AMAP.amap_get_weather,
     "QWEATHER_KEY": QWEATHER.qweather_get_weather,
@@ -58,17 +62,18 @@ class get_weather:
         - city_name: str 城市名
         - get_default_platform: str 平台
         """
-        #
-        # 启用本地经纬度数据库和支持的部分
-        # #
-        if XjieVariable._Local_in_latitude_and_longitude is True and get_default_platform[0] in Latitude_and_longitude_platform:
-            print(city_name)
+        async def localdata_code():
             List_of_regions = DatabaseManager.city_lnglat(city_name)
             if len(List_of_regions) > 1:
                 return ["multi_area", get_default_platform[0], List_of_regions]
             if get_default_platform[0] not in select_get_platform_s:
                 return ["error", '未知平台']
-            return await select_get_platform_s[get_default_platform[0]](city_name, loglat=get_default_platform)
+            return await select_get_platform_s[get_default_platform[0]](city_name, key=get_default_platform[1])
+        #
+        # 启用本地经纬度数据库和支持的部分
+        # #
+        if XjieVariable._Local_in_latitude_and_longitude is True and get_default_platform[0] in Latitude_and_longitude_platform:
+            return await localdata_code()
 
         #
         # 默认
@@ -76,6 +81,8 @@ class get_weather:
         else:
             if get_default_platform[0] not in select_get_platform_s:
                 return ["error", '未知平台']
+            if get_default_platform[0] in only_localdata:
+                return await localdata_code()
             return await select_get_platform_s[get_default_platform[0]](city_name, key=get_default_platform[1])
 
     async def xj_get_weather_p(self, list,):
