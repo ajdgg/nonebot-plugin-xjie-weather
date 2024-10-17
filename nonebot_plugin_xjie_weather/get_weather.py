@@ -77,16 +77,6 @@ class get_weather:
             if get_default_platform[0] not in select_get_platform_s:
                 return ["error", '未知平台']
             return await select_get_platform_s[get_default_platform[0]](city_name, key=get_default_platform[1])
-        # if get_default_platform is None or get_default_platform == '':
-        #     MR_AP = a_qf()
-        #     if MR_AP[0] not in select_get_platform_s:
-        #         return ["error", '未知平台']
-        #     return select_get_platform_s[MR_AP[0]](city_name, MR_AP[1])
-        # else:
-        #     a_data = xj_file_handle.xj_file_reading("xjie_data.json", get_default_platform)
-        #     if get_default_platform not in select_get_platform_s:
-        #         return ["error", '未知平台']
-        #     return select_get_platform_s[get_default_platform](city_name, a_data)
 
     async def xj_get_weather_p(self, list,):
         return await select_get_platform_s[list[0]](list[2], list[1], province=list, complete=False)

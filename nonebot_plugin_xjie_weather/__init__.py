@@ -3,9 +3,6 @@ coding: UTF-8
 Author: AwAjie
 Date: 2024-07-05 16:26:29
 '''
-from PIL import Image
-import io
-from pathlib import Path
 from typing import List
 from nonebot.log import logger
 from nonebot.adapters import Message, Bot, Event
@@ -17,6 +14,7 @@ from nonebot.params import CommandArg, ArgPlainText
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from .config import XjieVariable, AMAP_KEY, QWEATHER_KEY, QWEATHER_APITYPE
 from .file_handle import xj_file_handle
+from .xj_requests import xj_requests
 from .data_utilities import l_list, menu_dispose
 from .setup import xj_setup
 
@@ -63,6 +61,11 @@ _special_position_temporary_storage = {}
 xj_weather = on_command("天气", rule=to_me(), priority=10, block=True)
 
 
+async def plugin_versions_data(url):
+    async with xj_requests() as xj:
+        return await xj.xj_requests_main(url)
+
+
 def get_the_default_platform():
     """
     获取默认平台
@@ -102,7 +105,7 @@ async def handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
 async def got_location(event: Event, xj_user_message: str = ArgPlainText()):
     #
     # get_weather.xj_get_weather_main返回 [状态类型， 数据内容]
-    # 进入重复选择的信息类型 ["Selective_area", 平台名称, 平台key, 重复的数据数组]
+    # 进入重复选择的信息类型 ["Selective_area", 是否是本地内容, 平台名称, 平台key, 重复的数据数组]
     # #
 
     user_id = event.get_user_id()
@@ -125,15 +128,17 @@ async def got_location(event: Event, xj_user_message: str = ArgPlainText()):
         elif bot_result[0] == "multi_area":
             _special_position_temporary_storage[user_id] = [
                 "Selective_area",
+                "multi_area",
                 bot_result[1],
                 XjieVariable._get_default_platform["mr"][1],
                 bot_result[2]
             ]
-            await xj_weather.send(menu_dispose(l_list(bot_result[1])))
+            await xj_weather.send(menu_dispose(l_list(bot_result[2])))
         elif bot_result[0] == "multi_area_app":
             if bot_result[1] == "AMAP_KEY":
                 _special_position_temporary_storage[user_id] = [
                     "Selective_area",
+                    "multi_area_app",
                     bot_result[1],
                     XjieVariable._get_default_platform["mr"][1],
                     [
@@ -142,6 +147,18 @@ async def got_location(event: Event, xj_user_message: str = ArgPlainText()):
                     ],
                 ]
                 await xj_weather.send(menu_dispose([item["formatted_address"] for item in bot_result[3]]))
+            elif bot_result[1] == "QWEATHER_KEY":
+                _special_position_temporary_storage[user_id] = [
+                    "Selective_area",
+                    "multi_area_app",
+                    bot_result[1],
+                    XjieVariable._get_default_platform["mr"][1],
+                    [
+                        {"formatted_address": item["adm1"] + item["name"], "adcode": item["id"]}
+                        for item in bot_result[3]
+                    ],
+                ]
+                await xj_weather.send(menu_dispose([item['adm1'] + item['name'] for item in bot_result[3]]))
 
     #
     # 无默认api
@@ -159,10 +176,9 @@ async def got_location(event: Event, xj_user_message: str = ArgPlainText()):
                 XjieVariable._get_default_platform["mr"][1],
                 bot_result[2]
             ]
-            await xj_weather.send(menu_dispose(l_list(bot_result[1])))
+            await xj_weather.send(menu_dispose(l_list(bot_result[2])))
         elif bot_result[0] == "multi_area_app":
             if bot_result[1] == "AMAP_KEY":
-                print("asdddd")
                 _special_position_temporary_storage[user_id] = [
                     "Selective_area",
                     bot_result[1],
@@ -173,6 +189,18 @@ async def got_location(event: Event, xj_user_message: str = ArgPlainText()):
                     ],
                 ]
                 await xj_weather.send(menu_dispose([item["formatted_address"] for item in bot_result[3]]))
+            elif bot_result[1] == "QWEATHER_KEY":
+                _special_position_temporary_storage[user_id] = [
+                    "Selective_area",
+                    "multi_area_app",
+                    bot_result[1],
+                    XjieVariable._get_default_platform["mr"][1],
+                    [
+                        {"formatted_address": item["adm1"] + item["name"], "adcode": item["id"]}
+                        for item in bot_result[3]
+                    ],
+                ]
+                await xj_weather.send(menu_dispose([item['adm1'] + item['name'] for item in bot_result[3]]))
 
 
 special_position_temporary_storage_handle = on_message(rule=lambda event: isinstance(event, Event) and _special_position_temporary_storage.get(event.get_user_id(), [None])[0] == "Selective_area", priority=5)
@@ -187,20 +215,41 @@ async def special_position_temporary_storage_handle_fun(event: Event):
         del _special_position_temporary_storage[user_id]
         await special_position_temporary_storage_handle.finish("已退出")
 
-    if _special_position_temporary_storage[user_id][1] == "AMAP_KEY":
+    try:
+        args = int(args)
+    except ValueError:
+        await special_position_temporary_storage_handle.finish("请输入正确的序号")
+
+    if len(_special_position_temporary_storage[user_id][4]) < args:
+        await special_position_temporary_storage_handle.finish("112")
+
+    if _special_position_temporary_storage[user_id][1] == "multi_area_app":
+
         bot_result = await get_weather.xj_get_weather_p(
             [
-                _special_position_temporary_storage[user_id][1],
                 _special_position_temporary_storage[user_id][2],
-                _special_position_temporary_storage[user_id][3][int(args) - 1].get(
+                _special_position_temporary_storage[user_id][3],
+                _special_position_temporary_storage[user_id][4][args - 1].get(
                     "formatted_address", None
                 ),
                 None,
                 None,
                 None,
-                _special_position_temporary_storage[user_id][3][int(args) - 1].get(
+                _special_position_temporary_storage[user_id][4][args - 1].get(
                     "adcode", None
                 ),
+            ]
+        )
+    elif _special_position_temporary_storage[user_id][1] == "multi_area":
+        bot_result = await get_weather.xj_get_weather_p(
+            [
+                _special_position_temporary_storage[user_id][2],
+                _special_position_temporary_storage[user_id][3],
+                _special_position_temporary_storage[user_id][4][args - 1][1] + _special_position_temporary_storage[user_id][4][args - 1][0],
+                _special_position_temporary_storage[user_id][4][args - 1][1],
+                _special_position_temporary_storage[user_id][4][args - 1][2],
+                _special_position_temporary_storage[user_id][4][args - 1][3],
+                None,
             ]
         )
 
@@ -209,9 +258,14 @@ async def special_position_temporary_storage_handle_fun(event: Event):
     del _special_position_temporary_storage[user_id]
 
 
-lg = on_command("lg", rule=to_me(), priority=10, block=True)
+plugin_versions = on_command("pv", rule=to_me(), priority=10, block=True)
 
 
-@lg.handle()
-async def lg_handle_first_receive(args: Message = CommandArg()):
-    await lg.finish(str(dblg.city_lnglat(args.extract_plain_text())))
+@plugin_versions.handle()
+async def plugin_versions_handle(bot: Bot, event: Event):
+    await plugin_versions.send("正在查询，请稍后awa...")
+    response = await plugin_versions_data("https://pypi.org/pypi/nonebot-plugin-xjie-weather/json")
+    if response.status_code == 200:
+        data = response.json()
+        await plugin_versions.finish(f"当前插件版本为：{XjieVariable.plugin_version}\n最新版本为：{data['info']['version']}")
+    await plugin_versions.finish("查询失败，请稍后再试awa")

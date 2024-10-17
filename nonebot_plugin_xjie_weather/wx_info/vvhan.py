@@ -1,3 +1,8 @@
+'''
+coding: UTF-8
+Author: AwAjie
+Date: 2024-08-09 19:50:45
+'''
 from ..xj_requests import xj_requests
 from ..main import weather_img
 from typing import List
@@ -11,7 +16,7 @@ class VVHAN:
         async with xj_requests() as xj:
             return await xj.xj_requests_main(url)
 
-    async def vvhan_weather(self, city_name: str, key: str):
+    async def vvhan_weather(self, city_name: str, key: str, province=None, complete: bool = True):
         vvhan_weather_url = "https://api.vvhan.com/api/weather"
         vvhan_weather_realtime_url = f"{vvhan_weather_url}?city={city_name}"
         vvhan_weather_oneweek_url = f"{vvhan_weather_url}?city={city_name}&type=week"

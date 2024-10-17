@@ -48,11 +48,15 @@ class AMAP:
         xiangy = coding_json.get('status')
         if xiangy == 0:
             return ["error", coding_json["info"]]
-        if len(coding_json.get('geocodes', "")) > 1:
+        validation_one = len(coding_json.get('geocodes', []))
+        print(len(coding_json.get('geocodes', "")))
+        if validation_one > 1:
             return ["multi_area_app", "AMAP_KEY", key, coding_json["geocodes"]]
+        if validation_one == 0:
+            return ["error", "获取城市编码失败"]
         return ["ok", coding_json["geocodes"][0]["adcode"]]
 
-    async def amap_get_weather(self, city_name: str, key: str, province=None, complete: bool = True):
+    async def amap_get_weather(self, city_name, key: str, province=None, complete: bool = True):
         """
         async获取高德地图城市天气
 
@@ -72,6 +76,8 @@ class AMAP:
         city_adcode = None
         if complete:
             city_adcode = await self.amap_get_adcode(city_name, key)
+            if city_adcode[0] == "error":
+                return city_adcode
             if city_adcode[0] == "multi_area_app":
                 return city_adcode
             city_adcode = city_adcode[1]

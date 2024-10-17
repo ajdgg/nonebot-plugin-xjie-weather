@@ -1,3 +1,8 @@
+'''
+coding: UTF-8
+Author: AwAjie
+Date: 2024-07-09 19:31:08
+'''
 import httpx
 from typing import Dict, Any
 
@@ -41,8 +46,6 @@ class xj_requests:
         """
         try:
             response = await self.client.get(url, params=params, headers=headers)
-            response.raise_for_status()
-            print(response.status_code, "请求成功")
             return response
         except httpx.HTTPStatusError as e:
             print(f"HTTP错误发生: {e}")
