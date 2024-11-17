@@ -12,13 +12,15 @@ from pathlib import Path
 class DatabaseManager:
     def __init__(self, db_path=None):
         if db_path is None:
-            db_path = Path(__file__).resolve().parent / 'db/region.db'
+            db_path = Path(__file__).resolve().parent / 'db/new_city.db'
         self.conn = sqlite3.connect(db_path, timeout=10)  # 设置连接超时
         self.cursor = self.conn.cursor()
 
     def city_lnglat(self, value: str, key="name"):
         try:
-            query = f'SELECT {key}, lng, lat FROM region WHERE {key} LIKE ?'
+            # query = f'SELECT lng, lat FROM region WHERE {key} LIKE ?'
+            # self.cursor.execute(query, (f'{value}%',))
+            query = f'SELECT {key}, home_provinced, lng, lat FROM region WHERE {key} LIKE ?'
             self.cursor.execute(query, (value + '%',))
             row = self.cursor.fetchall()
             return row
@@ -35,3 +37,6 @@ class DatabaseManager:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+    # def __del__(self):
+    #     self.close()

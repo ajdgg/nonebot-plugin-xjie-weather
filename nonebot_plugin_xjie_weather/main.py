@@ -1,9 +1,13 @@
 '''
 coding: UTF-8
 Author: AwAjie
-Date: 2024-07-09 19:31:08
+Date: 2024-07-05 16:26:29
 '''
 import jinja2
+import io
+import asyncio
+import time
+import os
 from pathlib import Path
 from .weather_img_data import weather_iaqamg
 from playwright.async_api import async_playwright
@@ -32,6 +36,18 @@ def weather_html(data, data_type: str):
     return "200"
 
 
+# async def open_local_html():
+#     async with async_playwright() as p:
+#         browser = await p.chromium.launch(headless=True, slow_mo=1000)
+#         page = await browser.new_page()
+#         html_file_path = Path(__file__).resolve().parent / "src/output.html"
+#         await page.goto(f"file:///{html_file_path}")
+#         screenshot_path = Path(__file__).resolve().parent / "weatherforecast.png"
+#         await page.locator("#main").screenshot(path=screenshot_path)
+#         print(await page.title())
+#         await browser.close()
+
+
 # 新 new
 async def open_local_html():
     async with async_playwright() as p:
@@ -40,7 +56,6 @@ async def open_local_html():
         html_file_path = Path(__file__).resolve().parent / "src/output.html"
         await page.goto(f"file:///{html_file_path}")
         screenshot_image = await page.locator("#main").screenshot(type='png')
-        print(await page.title())
         await browser.close()
         return screenshot_image
 
@@ -53,6 +68,16 @@ class weather_img:
         pass
 
     async def get_weather_img(self, data_all, data_base, api_name, city):
+        """main
+
+        Args:
+            data_all (list): 一周天气
+            data_base (obj): 当天天气
+            api_name (_type_): _description_
+            city (_type_): _description_
+
+        Returns:
+        """
         _data_obj["base"] = data_base
         _data_obj["all"] = data_all
         data_ha = weather_iaqamg.get_weather_getimg_data(_data_obj, api_name)

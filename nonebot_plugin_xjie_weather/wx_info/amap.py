@@ -48,8 +48,10 @@ class AMAP:
         xiangy = coding_json.get('status')
         if xiangy == 0:
             return ["error", coding_json["info"]]
+        # adcode = coding_json["geocodes"][0]["adcode"]-+        # if adcode is None:
+        #     return ["error", "错误"]
+        # return adcode
         validation_one = len(coding_json.get('geocodes', []))
-        print(len(coding_json.get('geocodes', "")))
         if validation_one > 1:
             return ["multi_area_app", "AMAP_KEY", key, coding_json["geocodes"]]
         if validation_one == 0:
@@ -70,7 +72,6 @@ class AMAP:
             Any: 请求的结果。返回的类型取决于服务器响应的内容。
         """
         if isinstance(city_name, List):
-            print(city_name, "lim")
             city_name = city_name[0] + city_name[1]
 
         city_adcode = None

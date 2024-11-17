@@ -44,10 +44,13 @@ class xj_file_handle:
             return loaded_data.get(file_content, None)
         except FileNotFoundError:
             print(f"找不到文件: {file_name}")
+            return None
         except json.JSONDecodeError:
             print(f"从文件解码JSON时出错: {file_name}")
+            return None
         except Exception as e:
             print(f"发生错误: {e}")
+            return None
 
     def xj_file_change(self, file_name: str, file_key: str, file_content: str):
         """

@@ -1,7 +1,7 @@
 '''
 coding: UTF-8
 Author: AwAjie
-Date: 2024-07-09 19:31:08
+Date: 2024-07-05 16:26:29
 '''
 import httpx
 from typing import Dict, Any
@@ -15,7 +15,7 @@ class xj_requests:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.client.aclose()
 
-    async def xj_requests_main(self, url: str, params: Dict[str, Any] = None, headers: Dict[str, str] = None) -> httpx.Response:
+    async def xj_requests_main(self, url: str, params: Dict[str, Any] = None, headers: Dict[str, str] = None, timeout: float = 20.0) -> httpx.Response:
         """
         异步地向提供的URL发送GET请求。
 
@@ -44,8 +44,12 @@ class xj_requests:
         Exception
             对于任何其他未预期的错误。
         """
+        print(url)
         try:
-            response = await self.client.get(url, params=params, headers=headers)
+            response = await self.client.get(url, params=params, headers=headers, timeout=timeout)
+            response.raise_for_status()
+            print(response.status_code, "请求成功")
+            print(response, "请求成功")
             return response
         except httpx.HTTPStatusError as e:
             print(f"HTTP错误发生: {e}")

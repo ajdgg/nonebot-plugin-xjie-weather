@@ -11,6 +11,7 @@ from nonebot.typing import T_State
 from .data_utilities import menu_dispose, is_integer_not_float
 from .file_handle import xj_file_handle
 from .config import XjieVariable, X_SUPERUSERS
+from nonebot.log import logger
 
 
 xj_file_handle = xj_file_handle()
@@ -29,7 +30,7 @@ xj_no = ['否', 'n', 'no', 'N', 'NO', 'No', 'nO', 'N0']
 
 dz = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
-setup_function_list = ['配置key', '设置优先平台', '和风天气订阅类型']
+setup_function_list = ['配置key', '设置优先平台', '和风天气订阅类型', '占位', '是否启用本地数据库']
 qweather_subscribe = ['免费订阅', '付费订阅']
 
 
@@ -125,8 +126,10 @@ async def configuration_responsive(bot: Bot, event: Event):
     elif _configuration_option.get("option") == "setting_list":
 
         if _configuration_option["ground-floor"] and is_integer_not_float(args):
+            logger.warning(f"\033经{args},jincos1\033[0m")
             try:
                 args = dz[int(args)]
+                logger.warning(f"\033经{args},cos1\033[0m")
             except IndexError:
                 await xj_setup_responsive.send("输入错误，请重新输入")
 
@@ -147,12 +150,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                     await xj_setup_responsive.send("配置成功")
                     XjieVariable._get_default_platform["xjie_data"] = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
 
-                    _time_a["t"] = False
-                    _configuration_option["ground-floor"] = True
-                    _configuration_option["SG"] = False
-                    del _configuration_state[user_id]
-                    del _configuration_option["SL"]
-                    del _configuration_option["option"]
+                    remove_if_exists(user_id)
 
                 else:
 
@@ -168,6 +166,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                             print(f"索引 {int(args)} 无效，列表长度为 {len(keys_ending_with_KEY)}")
                             await xj_setup_responsive.finish("输入错误，请重新输入")
                     else:
+                        logger.warning(f"\033{args},cos12\033[0m")
                         await xj_setup_responsive.send("输入错误")
             else:
                 await xj_setup_responsive.send(f"请选择要设置的key\n{menu_dispose(keys_ending_with_KEY)}")
@@ -188,12 +187,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                     except IndexError:
                         await xj_setup_responsive.send("输入错误，请重新输入")
 
-                    _time_a["t"] = False
-                    _configuration_option["ground-floor"] = True
-                    _configuration_option["SG"] = False
-                    del _configuration_state[user_id]
-                    del _configuration_option["SL"]
-                    del _configuration_option["option"]
+                    remove_if_exists(user_id)
                 else:
                     await xj_setup_responsive.send("输入错误")
             else:
@@ -210,12 +204,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                         xj_file_handle.xj_file_change("xjie_data.json", "QWEATHER_APITYPE", int(args) - 1)
                         await xj_setup_responsive.send(f"和风天气订阅已切换为{qweather_subscribe[int(args) - 1]}")
 
-                        _time_a["t"] = False
-                        _configuration_option["ground-floor"] = True
-                        _configuration_option["SG"] = False
-                        del _configuration_state[user_id]
-                        del _configuration_option["SL"]
-                        del _configuration_option["option"]
+                        remove_if_exists(user_id)
                     except IndexError:
                         print("IndexError")
                         await xj_setup_responsive.send("输入错误，请重新输入")
@@ -223,6 +212,37 @@ async def configuration_responsive(bot: Bot, event: Event):
                     await xj_setup_responsive.send("输入错误")
             else:
                 await xj_setup_responsive.send(f"请选择要设置的key\n{menu_dispose(qweather_subscribe)}")
+                _configuration_option["SG"] = True
+        elif args == 'four' or _configuration_option.get("SL", '') == '4':
+            _configuration_option["ground-floor"] = False
+            _configuration_option["SL"] = "4"
+
+            await xj_setup_responsive.send("展位")
+            remove_if_exists(user_id)
+        elif args == 'five' or _configuration_option.get("SL", '') == '5':
+            _configuration_option["ground-floor"] = False
+            _configuration_option["SL"] = "5"
+            if _configuration_option["SG"]:
+                if args in xj_yes:
+                    if XjieVariable._Local_database_status is True:
+                        await xj_setup_responsive.send("本地数据库已是开启状态")
+                    else:
+                        xj_file_handle.xj_file_change("xjie_data.json", "Local_database_status", True)
+                        XjieVariable._Local_database_status = True
+                        await xj_setup_responsive.send("已开启本地数据库")
+                    remove_if_exists(user_id)
+                elif args in xj_no:
+                    if XjieVariable._Local_database_status is False:
+                        await xj_setup_responsive.send("本地数据库已是关闭状态")
+                    else:
+                        xj_file_handle.xj_file_change("xjie_data.json", "Local_database_status", False)
+                        XjieVariable._Local_database_status = False
+                        await xj_setup_responsive.send("已关闭本地数据库")
+                    remove_if_exists(user_id)
+                else:
+                    await xj_setup_responsive.send("请选择是或否")
+            else:
+                await xj_setup_responsive.send(f'是否启用本地数据库[Y/N]\n目前状态:{XjieVariable._Local_database_status}')
                 _configuration_option["SG"] = True
         else:
             await xj_setup_responsive.send("输入错误")

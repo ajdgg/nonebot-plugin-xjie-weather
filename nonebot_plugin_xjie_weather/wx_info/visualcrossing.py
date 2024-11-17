@@ -4,12 +4,13 @@ Author: AwAjie
 Date: 2024-08-26 23:50:21
 '''
 from ..xj_requests import xj_requests
-from ..xjie_db import DatabaseManager
+from ..main import weather_img
+
+
+weather_img = weather_img()
 
 
 class VISUALCROSSING:
-    def __init__(self) -> None:
-        self.db = DatabaseManager()
 
     """
     visualcrossing
@@ -21,11 +22,16 @@ class VISUALCROSSING:
         async with xj_requests() as xj:
             return await xj.xj_requests_main(url)
 
-    async def visualcrossing_weather(self, citly: str, key: str) -> any:
+    async def visualcrossing_weather(self, city_name: str, key: str, province=None, complete: bool = True) -> any:
         visualcrossing_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
-        latlng = self.db.city_lnglat(citly)
-        self.db.close()
-        visualcrossing_url += f"{latlng[0]},{latlng[1]}?include=days&lang=zh&key={key}&contentType=json"
+
+        visualcrossing_url += f"{province[4]},{province[5]}?include=days&lang=zh&key={key}&contentType=json"
         weather_data = await self.__fetch_data(visualcrossing_url)
         if weather_data is None:
             return ['error', '请求失败']
+        weather_data = weather_data.json()
+
+        weather_data_all = weather_data["days"]
+        weather_data_base = weather_data["days"][0]
+
+        return await weather_img.get_weather_img(weather_data_all, weather_data_base, "VISUALCROSSING", city_name)

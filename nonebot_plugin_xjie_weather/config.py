@@ -27,7 +27,7 @@ QWEATHER_APITYPE = plugin_config.qweather_apitype
 
 
 class XjieVariable:
-    plugin_version = "1.2.1"
+    plugin_version = "1.2.2"
     _admin_whitelist = []
     try:
         administrator = xj_file_handle.xj_file_reading("xjie_data.json", "admin_whitelist")
@@ -46,6 +46,7 @@ class XjieVariable:
     default_api_key = xj_file_handle.xj_file_reading("xjie_data.json", default_api)
     _get_default_platform["mr"] = [default_api, default_api_key]
 
-    _Local_in_latitude_and_longitude = xj_file_handle.xj_file_reading("xjie_data.json", "Local_in_latitude_and_longitude")
+    Local_database_status = xj_file_handle.xj_file_reading("xjie_data.json", "Local_database_status")
+    _Local_database_status = Local_database_status
 
     QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")

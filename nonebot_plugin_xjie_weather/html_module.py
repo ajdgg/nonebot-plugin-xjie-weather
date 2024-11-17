@@ -1,3 +1,8 @@
+'''
+coding: UTF-8
+Author: AwAjie
+Date: 2024-08-07 15:29:05
+'''
 from typing import List
 
 
@@ -57,3 +62,11 @@ class HtmlModule:
                     <div class="humidness-data">能见度：{visibility}/km</div>
                 </div>
                 '''
+
+    def mp2_5(self, mp2_5: str) -> str:
+        return f"""
+                    <div class="weather-chunk">
+                    <div class="w-image .PM2-5-2-Outlined"></div>
+                    <div class="humidness-data">能见度：{mp2_5}/km</div>
+                </div>
+                """

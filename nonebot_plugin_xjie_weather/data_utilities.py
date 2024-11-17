@@ -97,3 +97,14 @@ def save_superusers(superusers):
     """
     superusers_str = ",".join(map(str, superusers))
     xj_file_handle.xj_file_change("xjie_data.json", "admin_whitelist", superusers_str)
+
+
+def l_list(list_data):
+    """拼接字符串
+    Args:
+        list_data (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    return [f"{province}-{district}" for district, province, _, _ in list_data]

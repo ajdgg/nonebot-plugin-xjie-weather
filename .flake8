@@ -1,3 +1,4 @@
 [flake8]
-ignore = F401 E402
-max-line-length = 600
+ignore = F401 E402 E117
+max-line-length = 1600
+exclude = tests/*

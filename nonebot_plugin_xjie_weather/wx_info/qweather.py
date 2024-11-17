@@ -90,9 +90,9 @@ class QWEATHER:
 
         qweather_url = self.__qweather_return_url()
         location_data = location_data if location_data is not None else (f"{province[4]:.2f}" + "," + f"{province[5]:.2f}") if province[4] is not None and province[5] is not None else province[6]
-        print(location_data, "1")
-        print(XjieVariable._Local_in_latitude_and_longitude, "3")
-        print(province[6], "4")
+        # print(location_data, "1")
+        # print(XjieVariable._Local_database_status, "3")
+        # print(province[6], "4")
         weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
         hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
 

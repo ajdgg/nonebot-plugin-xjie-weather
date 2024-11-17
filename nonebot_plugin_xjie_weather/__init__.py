@@ -258,7 +258,7 @@ async def special_position_temporary_storage_handle_fun(event: Event):
     del _special_position_temporary_storage[user_id]
 
 
-plugin_versions = on_command("pv", rule=to_me(), priority=10, block=True)
+plugin_versions = on_command("ver", rule=to_me(), priority=10, block=True)
 
 
 @plugin_versions.handle()

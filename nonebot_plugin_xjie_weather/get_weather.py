@@ -64,15 +64,27 @@ class get_weather:
         """
         async def localdata_code():
             List_of_regions = DatabaseManager.city_lnglat(city_name)
-            if len(List_of_regions) > 1:
+            print(List_of_regions)
+            if (List_of_regions == []):
+                return ["error", '未知城市']
+            if len(List_of_regions) == 1:
                 return ["multi_area", get_default_platform[0], List_of_regions]
             if get_default_platform[0] not in select_get_platform_s:
                 return ["error", '未知平台']
-            return await select_get_platform_s[get_default_platform[0]](city_name, key=get_default_platform[1])
+            data = [
+                get_default_platform[0],
+                get_default_platform[1],
+                List_of_regions[0],
+                List_of_regions[1],
+                List_of_regions[2],
+                List_of_regions[3],
+                None,
+            ]
+            return await select_get_platform_s[get_default_platform[0]](city_name, key=get_default_platform[1], province=data, complete=False)
         #
         # 启用本地经纬度数据库和支持的部分
         # #
-        if XjieVariable._Local_in_latitude_and_longitude is True and get_default_platform[0] in Latitude_and_longitude_platform:
+        if XjieVariable._Local_database_status is True and get_default_platform[0] in Latitude_and_longitude_platform:
             return await localdata_code()
 
         #
