@@ -27,7 +27,7 @@ QWEATHER_APITYPE = plugin_config.qweather_apitype
 
 
 class XjieVariable:
-    plugin_version = "1.2.2"
+    plugin_version = "1.2.4"
     _admin_whitelist = []
     try:
         administrator = xj_file_handle.xj_file_reading("xjie_data.json", "admin_whitelist")
