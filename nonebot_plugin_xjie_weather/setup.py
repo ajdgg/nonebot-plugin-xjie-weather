@@ -1,16 +1,14 @@
 import asyncio
 from pathlib import Path
 from typing import List
-from nonebot import on_command, on_message, get_bot, require
+from nonebot import on_command, on_message, get_bot
 from nonebot.rule import to_me
-from nonebot.params import CommandArg, ArgPlainText
-from nonebot.adapters import Message
-from nonebot.matcher import Matcher
-from nonebot.adapters import Bot, Event
+from nonebot.params import CommandArg
+from nonebot.adapters import Message, Bot, Event
 from nonebot.typing import T_State
 from .data_utilities import menu_dispose, is_integer_not_float
 from .file_handle import xj_file_handle
-from .config import XjieVariable, X_SUPERUSERS
+from .config import XjieVariable
 from nonebot.log import logger
 
 
