@@ -44,12 +44,9 @@ class xj_requests:
         Exception
             对于任何其他未预期的错误。
         """
-        print(url)
         try:
             response = await self.client.get(url, params=params, headers=headers, timeout=timeout)
             response.raise_for_status()
-            print(response.status_code, "请求成功")
-            print(response, "请求成功")
             return response
         except httpx.HTTPStatusError as e:
             print(f"HTTP错误发生: {e}")

@@ -7,10 +7,10 @@ from ..xj_requests import xj_requests
 from ..main import weather_img
 from ..config import XjieVariable
 from typing import List
-
+import jwt
+import time
 
 weather_img = weather_img()
-XjieVariable = XjieVariable()
 
 
 class QWEATHER:
@@ -23,9 +23,22 @@ class QWEATHER:
     获取和风天气城市天气
         qweather_get_weather(city_name: str, key: str)
     """
-    async def __fetch_data(self, url):
+    def Qjwt(self, key) -> str:
+        HeaderObj = {
+            "alg": "EdDSA",
+            "kid": XjieVariable.QWEATHER_JWT_SUB
+        }
+        PayloadObj = {
+            "sub": XjieVariable.QWEATHER_JWT_KID,
+            "iat": int(time.time()) - 30,
+            "exp": int(time.time()) + 900
+        }
+
+        return jwt.encode(PayloadObj, key, headers=HeaderObj, algorithm='EdDSA')
+
+    async def __fetch_data(self, url, headers=None):
         async with xj_requests() as xj:
-            return await xj.xj_requests_main(url)
+            return await xj.xj_requests_main(url, headers=headers)
 
     def __qweather_return_url(self) -> str:
         if XjieVariable.QWEATHER_APITYPE == 0:
@@ -48,14 +61,24 @@ class QWEATHER:
         location = 'https://geoapi.qweather.com/v2/city/lookup'
 
         if isinstance(city_name, List):
-            location_url = f'{location}?location={city_name[1]}&adm={city_name[0]}&key={key}'
+            location_params = f'location={city_name[1]}&adm={city_name[0]}'
         else:
-            location_url = f'{location}?location={city_name}&key={key}'
+            location_params = f'location={city_name}'
 
-        gd_city_adcode = await self.__fetch_data(location_url)
+        if XjieVariable.QWEATHER_JWT:
+            xheader = {
+                "Authorization": 'Bearer ' + self.Qjwt(key)
+            }
+            location_url = f'{location}?{location_params}'
+            headers = xheader
+        else:
+            location_url = f'{location}?{location_params}&key={key}'
+            headers = None
+
+        gd_city_adcode = await self.__fetch_data(location_url, headers=headers)
+
         if gd_city_adcode is None:
             return ['error', '网络延迟过高']
-            # raise ValueError("Failed to send request")
         coding_json = gd_city_adcode.json()
         if coding_json.get('code') != '200':
             return ["error", '获取城市编码失败']
@@ -78,7 +101,7 @@ class QWEATHER:
         返回:
             Any: 请求的结果。返回的类型取决于服务器响应的内容。
         """
-
+        key = key if XjieVariable.QWEATHER_JWT else XjieVariable.QWEATHER_KEY
         location_data = None
         if complete:
             location_data = await self.qweather_get_location(city_name, key)
@@ -89,15 +112,26 @@ class QWEATHER:
             location_data = location_data[1]
 
         qweather_url = self.__qweather_return_url()
-        location_data = location_data if location_data is not None else (f"{province[4]:.2f}" + "," + f"{province[5]:.2f}") if province[4] is not None and province[5] is not None else province[6]
-        # print(location_data, "1")
-        # print(XjieVariable._Local_database_status, "3")
-        # print(province[6], "4")
-        weather_url = f'{qweather_url}7d?location={location_data}&key={key}'
-        hf_weather_url = f'{qweather_url}now?location={location_data}&key={key}'
+        if location_data is None:
+            if province[4] is not None and province[5] is not None:
+                location_data = f"{province[4]:.2f},{province[5]:.2f}"
+            else:
+                location_data = province[6]
 
-        hf_city_location = await self.__fetch_data(weather_url)
-        hf_city_location_base = await self.__fetch_data(hf_weather_url)
+        if XjieVariable.QWEATHER_JWT:
+            xheader = {
+                "Authorization": 'Bearer ' + self.Qjwt(key)
+            }
+            auth_param = ''
+            header = xheader
+        else:
+            auth_param = f'&key={key}'
+            header = None
+
+        base_url_template = f'{qweather_url}{{}}?location={location_data}{auth_param}'
+        hf_city_location = await self.__fetch_data(base_url_template.format('7d'), headers=header)
+        hf_city_location_base = await self.__fetch_data(base_url_template.format('now'), headers=header)
+
         if hf_city_location is None or hf_city_location_base is None:
             return ['error', '网络延迟过高']
         weather_json_a = hf_city_location.json()

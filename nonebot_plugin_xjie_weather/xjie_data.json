@@ -1,8 +1,14 @@
 {
     "AMAP_KEY": "",
+    "QWEATHER_JWT_KEY": "",
     "QWEATHER_KEY": "",
+    "VISUALCROSSING_KEY": "",
     "VVHAN_KEY": "No-keys-required",
     "QWEATHER_APITYPE": 0,
+    "QWEATHER_JWT_KID": "",
+    "QWEATHER_JWT_SUB": "",
+    "QWEATHER_JWT": false,
     "default_api": "",
+    "Local_database_status": false,
     "admin_whitelist": ""
 }

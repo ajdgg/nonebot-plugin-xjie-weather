@@ -29,6 +29,7 @@ def a_qf():
 
 Latitude_and_longitude_platform = [
     'QWEATHER_KEY',
+    "QWEATHER_JWT_KEY"
 ]
 
 only_localdata = [
@@ -37,6 +38,7 @@ only_localdata = [
 
 select_get_platform_s = {
     "AMAP_KEY": AMAP.amap_get_weather,
+    "QWEATHER_JWT_KEY": QWEATHER.qweather_get_weather,
     "QWEATHER_KEY": QWEATHER.qweather_get_weather,
     "VVHAN_KEY": VVHAN.vvhan_weather,
 }
@@ -67,17 +69,17 @@ class get_weather:
             print(List_of_regions)
             if (List_of_regions == []):
                 return ["error", '未知城市']
-            if len(List_of_regions) == 1:
+            if len(List_of_regions) > 1:
                 return ["multi_area", get_default_platform[0], List_of_regions]
             if get_default_platform[0] not in select_get_platform_s:
                 return ["error", '未知平台']
             data = [
                 get_default_platform[0],
                 get_default_platform[1],
-                List_of_regions[0],
-                List_of_regions[1],
-                List_of_regions[2],
-                List_of_regions[3],
+                List_of_regions[0][0],
+                List_of_regions[0][1],
+                List_of_regions[0][2],
+                List_of_regions[0][3],
                 None,
             ]
             return await select_get_platform_s[get_default_platform[0]](city_name, key=get_default_platform[1], province=data, complete=False)

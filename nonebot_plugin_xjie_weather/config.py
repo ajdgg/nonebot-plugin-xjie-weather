@@ -39,14 +39,19 @@ class XjieVariable:
         print(f"Error processing administrator list: {e}")
     _get_default_platform = {}
 
-    xj_data = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
-    _get_default_platform["xjie_data"] = xj_data
+    _get_default_platform["xjie_data"] = xj_file_handle.get_keys_ending_with_key("xjie_data.json")
 
     default_api = xj_file_handle.xj_file_reading("xjie_data.json", "default_api")
     default_api_key = xj_file_handle.xj_file_reading("xjie_data.json", default_api)
     _get_default_platform["mr"] = [default_api, default_api_key]
 
-    Local_database_status = xj_file_handle.xj_file_reading("xjie_data.json", "Local_database_status")
-    _Local_database_status = Local_database_status
+    _Local_database_status = xj_file_handle.xj_file_reading("xjie_data.json", "Local_database_status")
 
     QWEATHER_APITYPE = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_APITYPE")
+    QWEATHER_JWT = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_JWT")
+    QWEATHER_KEY = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_KEY")
+    QWEATHER_JWT_KID = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_JWT_KID")
+    QWEATHER_JWT_SUB = xj_file_handle.xj_file_reading("xjie_data.json", "QWEATHER_JWT_SUB")
+
+
+XjieVariable = XjieVariable()

@@ -42,7 +42,6 @@ class AMAP:
         get_place_url = f'{placen_url}?key={key}&address={city_name}&output=JSON'
         gd_city_adcode = await self.__fetch_data(get_place_url)
         if gd_city_adcode is None:
-            print(ValueError("Failed to send request"))
             return ["error", "获取城市编码失败"]
         coding_json = gd_city_adcode.json()
         xiangy = coding_json.get('status')

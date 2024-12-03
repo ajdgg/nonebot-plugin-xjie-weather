@@ -1,6 +1,4 @@
 import asyncio
-from pathlib import Path
-from typing import List
 from nonebot import on_command, on_message, get_bot
 from nonebot.rule import to_me
 from nonebot.params import CommandArg
@@ -15,7 +13,6 @@ from nonebot.log import logger
 xj_file_handle = xj_file_handle()
 
 _time_a = {}
-_get_default_platform = {}
 _configuration_state = {}
 _configuration_option = {}
 
@@ -28,7 +25,7 @@ xj_no = ['否', 'n', 'no', 'N', 'NO', 'No', 'nO', 'N0']
 
 dz = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
-setup_function_list = ['配置key', '设置优先平台', '和风天气订阅类型', '占位', '是否启用本地数据库']
+setup_function_list = ['配置key', '设置优先平台', '和风天气订阅类型', '是否启用和风天气jwt验证', '是否启用本地数据库']
 qweather_subscribe = ['免费订阅', '付费订阅']
 
 
@@ -161,7 +158,6 @@ async def configuration_responsive(bot: Bot, event: Event):
                             _configuration_option["X_KEY"] = a_data
                             _configuration_option["SF"] = True
                         except IndexError:
-                            print(f"索引 {int(args)} 无效，列表长度为 {len(keys_ending_with_KEY)}")
                             await xj_setup_responsive.finish("输入错误，请重新输入")
                     else:
                         logger.warning(f"\033{args},cos12\033[0m")
@@ -201,10 +197,8 @@ async def configuration_responsive(bot: Bot, event: Event):
                     try:
                         xj_file_handle.xj_file_change("xjie_data.json", "QWEATHER_APITYPE", int(args) - 1)
                         await xj_setup_responsive.send(f"和风天气订阅已切换为{qweather_subscribe[int(args) - 1]}")
-
                         remove_if_exists(user_id)
                     except IndexError:
-                        print("IndexError")
                         await xj_setup_responsive.send("输入错误，请重新输入")
                 else:
                     await xj_setup_responsive.send("输入错误")
@@ -215,14 +209,34 @@ async def configuration_responsive(bot: Bot, event: Event):
             _configuration_option["ground-floor"] = False
             _configuration_option["SL"] = "4"
 
-            await xj_setup_responsive.send("展位")
-            remove_if_exists(user_id)
+            if _configuration_option["SG"]:
+                if args in xj_yes:
+                    if XjieVariable.QWEATHER_JWT:
+                        await xj_setup_responsive.send("和风天气jwt验证已是开启状态")
+                    else:
+                        xj_file_handle.xj_file_change("xjie_data.json", "QWEATHER_JWT", True)
+                        XjieVariable.QWEATHER_JWT = True
+                        await xj_setup_responsive.send("已开启和风天气jwt验证")
+                    remove_if_exists(user_id)
+                elif args in xj_no:
+                    if not XjieVariable.QWEATHER_JWT:
+                        await xj_setup_responsive.send("和风天气jwt验证已是关闭状态")
+                    else:
+                        xj_file_handle.xj_file_change("xjie_data.json", "QWEATHER_JWT", False)
+                        XjieVariable.QWEATHER_JWT = False
+                        await xj_setup_responsive.send("已关闭和风天气jwt验证")
+                    remove_if_exists(user_id)
+                else:
+                    await xj_setup_responsive.send("请选择是或否")
+            else:
+                await xj_setup_responsive.send(f'是否启用和风天气jwt验证[Y/N]\n目前状态:{XjieVariable.QWEATHER_JWT}')
+                _configuration_option["SG"] = True
         elif args == 'five' or _configuration_option.get("SL", '') == '5':
             _configuration_option["ground-floor"] = False
             _configuration_option["SL"] = "5"
             if _configuration_option["SG"]:
                 if args in xj_yes:
-                    if XjieVariable._Local_database_status is True:
+                    if XjieVariable._Local_database_status:
                         await xj_setup_responsive.send("本地数据库已是开启状态")
                     else:
                         xj_file_handle.xj_file_change("xjie_data.json", "Local_database_status", True)
@@ -230,7 +244,7 @@ async def configuration_responsive(bot: Bot, event: Event):
                         await xj_setup_responsive.send("已开启本地数据库")
                     remove_if_exists(user_id)
                 elif args in xj_no:
-                    if XjieVariable._Local_database_status is False:
+                    if not XjieVariable._Local_database_status:
                         await xj_setup_responsive.send("本地数据库已是关闭状态")
                     else:
                         xj_file_handle.xj_file_change("xjie_data.json", "Local_database_status", False)
