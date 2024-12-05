@@ -44,14 +44,6 @@ select_get_platform_s = {
 }
 
 
-# def select_get_platform(city, key, platform):
-#     if platform == "AMAP_KEY":
-#         return AMAP.amap_get_weather(city, key)
-#     elif platform == "QWEATHER_KEY":
-#         return QWEATHER.qweather_get_weather(city, key)
-#     return
-
-
 class get_weather:
     def __init__(self):
         pass

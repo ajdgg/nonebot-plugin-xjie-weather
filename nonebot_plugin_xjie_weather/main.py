@@ -4,10 +4,6 @@ Author: AwAjie
 Date: 2024-07-05 16:26:29
 '''
 import jinja2
-import io
-import asyncio
-import time
-import os
 from pathlib import Path
 from .weather_img_data import weather_iaqamg
 from playwright.async_api import async_playwright
@@ -34,18 +30,6 @@ def weather_html(data, data_type: str):
     with open(Path(__file__).resolve().parent / "src/output.html", "w+", encoding="utf-8") as file:
         file.write(rendered_template)
     return "200"
-
-
-# async def open_local_html():
-#     async with async_playwright() as p:
-#         browser = await p.chromium.launch(headless=True, slow_mo=1000)
-#         page = await browser.new_page()
-#         html_file_path = Path(__file__).resolve().parent / "src/output.html"
-#         await page.goto(f"file:///{html_file_path}")
-#         screenshot_path = Path(__file__).resolve().parent / "weatherforecast.png"
-#         await page.locator("#main").screenshot(path=screenshot_path)
-#         print(await page.title())
-#         await browser.close()
 
 
 # 新 new
